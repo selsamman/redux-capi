@@ -6,7 +6,7 @@ To consume the API you invoke it and unpack any of the selectors, thunks or acti
  ```
  const { todo, completeTodo, deleteTodo, updateTodo } = todoAPI({todoId: props.id});
 ```
-redux-capi automatically re-renders the component when the value of any selectors that you reference changes because of a state mutation. You may also supply additional properties (id: props.id) as context that the API may use in redactions, thunks or selectors.  The context is specific to the component instance.
+redux-capi automatically re-renders the component when the value of any selectors that you reference change due to a state mutation. You may also supply additional properties (id: props.id) as context that the API may use in redactions, thunks or selectors.  The context is specific to the component instance.
 ### Redactions
 For mutating state you don't need reducers because the actions themselves contain meta information that is used by a master reducer.  In effect that are combination of an action and a reducer and are called redactions:
 
@@ -18,27 +18,27 @@ For mutating state you don't need reducers because the actions themselves contai
     }
   }),
 ```
-Redactions are exposed in the api as functions that are self-dispatching.  The meta-information defines a heirarchy of state properties that follow the shape of the state.  The properties to be modified are indicated by defining and action object (containing where and set in the example) that can define which element of an array is to be mutated and the new value.  
+Redactions are exposed in the api as functions that are self-dispatching.  The meta-information defines a heirarchy of state properties that follow the shape of the state.  For the properties to be modified you provide functions which can select a particular array element to be mutated and provide values.  Other meta indicators are used for deletion, insertion and appending data.  Under the covers this is all accomplished with a reducer.  
 
 ### Component Context
 
-Because APIs are designed to be consumed by a component they maintain a per-component-instance context.  That context is made available to thunks and selectors so that thunks can consume selectors and actions.  Selectors may also consume other selectors.  
+Because APIs are designed to be consumed by a component they maintain a per-component-instance context.  That context is made available to thunks and selectors so that thunks can consume selectors and redactions.  Selectors may also consume other selectors.  
 
-In addition the component may add property values to the context that selectors, redactions and thunks can use.  In the example above for editing a todoList item, the where function qualifies which todo is to be modified.  It is passed the state, the specific todo item and the api context:
+In addition the component may set property values in the context that selectors, redactions and thunks can use.  In the example above for editing a todoList item, the where function qualifies which todo is to be modified.  It is passed the state, the specific todo item and the api context so it can select the current todo item relavent to a component instance:
 ```
   where: (state, item, {todoId}) => item.id === todoId,
 ``` 
-todoId is a property of the context that is expected to be added at the time the api is consumed by the component:
+todoId is a property of the context that is expected to be added at the time the api is consumed by that component:
 ```
  const { todo, completeTodo, deleteTodo, updateTodo } = todoAPI({todoId: props.id});
 ```
 ### Selectors
-This is particularly important for selectors which cannot accept parameters.  So for example to select the "current" todo the selector can use the id from the context:
+Providing context properties is particularly important for selectors which cannot accept parameters.  It is what allows the selectors to be defined outside of a component.  So for example to select the "current" todo the selector can use the id from the context:
 ```
  todo: (state, api) => state.todos.find(t => t.id === api.todoId)
 ```
 ### Memoizing Selectors
-You would not want to invoke the find function everytime the selector is referenced since the todoList may not have changed.  To memoize the selector two functions are needed.  The first is the "invoker" which is passed the memoized selector, the api and the state.  It simply invokes the memomized selector to do the actual work.  The second is the selector which will automatically be memoized.  With this arrangement you can memoize any values such as from the state or from other selectors.
+You would not want to invoke the find function every time the selector is referenced since the todoList may not have changed.  To memoize the selector two functions are needed.  The first is the "invoker" which is passed the memoized selector, the api and the state.  It simply invokes the memomized selector to do the actual work.  The second is the selector which will automatically be memoized.  With this arrangement you can memoize based any values such as from the state or from other selectors.  You can even memoize based on values from the context itself.
 ```
  todo: [
     (select, api) => select(api.todoId, api.todos),

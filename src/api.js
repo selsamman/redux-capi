@@ -142,7 +142,7 @@ export const createAPI = ({selectors, thunks, redactions}) => {
     function processRedaction (prop, actionFunction) {
         apiContext[prop] = function() {
             var action = actionFunction.apply(null, arguments);
-            this.__store__.dispatch({type: 'Redaction', name: prop, reducer: {...action}, context: this, stateMap: apiContext.__state_map__});
+            this.__store__.dispatch({type: prop, __schema__: {...action}, context: this, stateMap: apiContext.__state_map__});
         }
     }
 

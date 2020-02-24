@@ -4,11 +4,11 @@ Actions have a type of 'Redaction'.  This reducer may be combined in the normal 
  */
 export const reducer = (rootState, action) => {
 
-    if (action.type !== 'Redaction')
+    if (!action.__schema__)
         return rootState;
 
     // Process each high level state property
-    let accumulator = { reactions: action.reducer, oldState: rootState, newState: {} };
+    let accumulator = { reactions: action.__schema__, oldState: rootState, newState: {} };
     return Object.getOwnPropertyNames(rootState).reduce(reducer, accumulator).newState;
 
     // Process state node (arrays normalized to return indes in value parameter)
