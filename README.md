@@ -199,3 +199,73 @@ Since redux-capi already has a selector-based mechanism to determine when a re-r
 
 ### API Composition and Mounting other than in the root pending implementation ###
 
+## Unit Testing 
+Because there is a clean line between visual components and your api you test these separately.  You make sure that your api responds property all redaction and thunk calls and that all selectors return the appropriate value.  With that done you only need to test that your component renders properly based on API selector values and that it calls the appropriate thunks and mutations with the correct values passed.
+
+###API Testing
+There are two strategies for testing the API:
+* If your API is simple enough you can test only it's inputs and outputs (e.g. redactions, thunks and selectors).
+* If your API is complex you may want to test how thunks and redactions affect the state and how selectors transform information that you manually put in the state.
+
+You test the API the way that it would be used in a component:
+
+```
+const apiSpec = {
+    redactions: {
+        increment: () => ({
+            count: {set: (state) => state.count + 1}
+        })
+    },
+    selectors: {
+        count: (state) => state.count
+    }
+}
+describe('Counter Testing', () => {
+    it('can increment', () => {
+        const api = createAPI(apiSpec).mount(createStore(reducer, {count: 0}));
+        const component = {};
+        {
+            const {increment} = api({}, component);
+            increment();
+            expect(api.getState().count).toBe(1);
+        } {
+            const {count} = api({}, component);
+            expect(count).toBe(1);
+        }
+    })
+});
+```
+### Component Testing
+For React you can use react-test-renderer/shallow (or other libraries) to render components and test them. A mock facility is provied that will:
+* Let you provide values for all selectors in the api
+* Record the the fact that redactions and thunks were called along with the argument values
+With that you can setup test values for you component (much the same you used to be able to do with High Order Components) and then examine the rendered structure to verify the results.  You can click on buttons or otherwise cause events to be dispatched that will ulimately result in a call to a thunk or a redaction and then verify the results:
+```
+describe('render', () => {
+    it('render', () => {
+         let store = createStore(reducer, defaultShape, applyMiddleware(ReduxThunk));
+         const api = createAPI(matrixAPISpec);
+         api.mount(store);
+         let mock = api.mock({matrix: {rows: [{ cols: ["foo"]}]}});
+         const Matrix = () => {
+             const {matrix, addCol} = api({});
+             return (
+             <ul>
+                 {matrix.rows.map((row, ix) =>
+                     <button key={ix + 1} onClick={()=>addCol(ix)}>{row.cols[0]}</button>
+                 )}
+             </ul>
+             )
+         }
+         renderer.render(<Matrix />);
+         const output = renderer.getRenderOutput();
+         expect(output.props.children.length).toBe(1);
+         expect(output.props.children[0].props.children).toBe("foo");
+         output.props.children[0].props.onClick({});
+         expect(mock.addCol.calls[0][0]).toBe(0);
+         api.unmock();
+     })
+})
+``` 
+
+
