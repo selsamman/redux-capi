@@ -1,15 +1,16 @@
-/*
-This reducer will accept actions that contain a state schema and function to return a value for a state property
-Actions have a type of 'Redaction'.  This reducer may be combined in the normal fashion for reducers.
- */
 export const reducer = (rootState, action) => {
 
     if (!action.__schema__)
         return rootState;
 
     // Process each high level state property
-    let accumulator = { reactions: action.__schema__, oldState: rootState, newState: {} };
-    return Object.getOwnPropertyNames(rootState).reduce(reducer, accumulator).newState;
+    if (rootState instanceof Array) {
+        let accumulator = { reactions: {_: action.__schema__}, oldState: {_:rootState}, newState: {} };
+        return Object.getOwnPropertyNames({_:rootState}).reduce(reducer, accumulator).newState['_'];
+    } else {
+        let accumulator = { reactions: action.__schema__, oldState: rootState, newState: {} };
+        return Object.getOwnPropertyNames(rootState).reduce(reducer, accumulator).newState;
+    }
 
     // Process state node (arrays normalized to return indes in value parameter)
     function reducer(accumulator, propOrIndex) {
@@ -39,6 +40,10 @@ export const reducer = (rootState, action) => {
         // If we have a reaction defined for this slice of the hierarchy we must copy state
         if (processChildNodes) {
             let subAccumulator;
+            if (Object.getOwnPropertyNames(children)[0] === '__state_marker__') {
+                children = children['__state_marker__'];
+                rootState = newState;
+            }
             if (newState instanceof Array)
                 subAccumulator =  oldState.reduce(arrayReducer, { oldState: newState, newState: [], reactions: children });
             else
@@ -69,21 +74,21 @@ export const reducer = (rootState, action) => {
     function execute(reducer, newState) {
         const context = action.context;
         if (reducer.set) {
-            return reducer.set.call(null, mapState(rootState), newState, context);
+            return reducer.set.call(null, rootState, newState, context);
         } else if (reducer.append) {
-            return newState.concat(reducer.append.call(null, mapState(rootState), context));
+            return newState.concat([reducer.append.call(null, rootState, context)]);
         } else if (reducer.insert) {
             let position = newState.length;
             if (reducer.after)
-                position = reducer.after.call(null, mapState(rootState), context) + 1;
+                position = reducer.after.call(null, rootState, context) + 1;
             if (reducer.before)
-                position = Math.max(reducer.before.call(null, mapState(rootState), context), 0);
-            var insertResult = reducer.insert.call(null, mapState(rootState), context);
+                position = Math.max(reducer.before.call(null, rootState, context), 0);
+            var insertResult = reducer.insert.call(null, rootState, context);
             var shallowCopy = newState.slice();
             shallowCopy.splice(position, 0, insertResult);
             return shallowCopy;
         } else if (reducer.assign) {
-            return Object.assign({}, newState, reducer.assign.call(null, mapState(rootState), newState, context));
+            return Object.assign({}, newState, reducer.assign.call(null, rootState, newState, context));
         } else if (reducer.delete) {
             return undefined;
         } else
@@ -96,78 +101,38 @@ export const reducer = (rootState, action) => {
     // to push the reaction node into the children array so it will be processed when the elements are evaluated
     function evaluate(reactionNode, reactionNodeKey, element, propOrIndex) {
 
+        let reactionNodeValue = reactionNode[reactionNodeKey];
+        const result = {};
+
         // Make sure reaction node matches state property name (unless processing an array)
-        if (typeof propOrIndex != "number" && reactionNodeKey !== propOrIndex)
+        if (propOrIndex != '_' && typeof propOrIndex != "number" && reactionNodeKey !== propOrIndex)
             return null;
 
-        const result = {};
-        for (let key in reactionNode[reactionNodeKey]) {
-            const reactionNodeValue = reactionNode[reactionNodeKey][key];
+        if (reactionNodeValue instanceof Array) {
+            if (typeof propOrIndex !== "number") // An array?
+                // Push this reaction node into children to be evaluated as array elements are stepped through
+                return {children: reactionNode}
 
-            // Are we dealing with array or array element
-            if (typeof reactionNodeValue === "function"  && key === "where") {
-                if (typeof propOrIndex !== "number") // An array?
-                    // Push this reaction node into children to be evaluated as array elements are stepped through
-                    return {children: reactionNode}
+            if (!reactionNodeValue[0].call(null, rootState, element, propOrIndex, action.context))
+                return null;
+            if (reactionNode[reactionNodeKey][1] instanceof Array)
+                return {children: {_:reactionNode[reactionNodeKey][1]}};
+            else
+                reactionNodeValue = reactionNode[reactionNodeKey][1];
+        }
 
-                // Otherwise and array instance and we eveluate if this is the correct instance
-                if (reactionNode.noMap) {  // If these nodes at root (from stateMap) don't map state passed in
-                    if (!reactionNodeValue.call(null, rootState, element, propOrIndex, action.context))
-                        return null;
-                } else {
-                    if (!reactionNodeValue.call(null, mapState(rootState), element, propOrIndex, action.context))
-                        return null;
-                }
-                continue; // Don't add where
-            }
+        for (let key in reactionNodeValue) {
+            const reactionNodeSubValue = reactionNodeValue[key];
+
             // These are commands to be executed
-            if ( typeof reactionNodeValue !== "object")
-                result[key] = reactionNodeValue;
+            if ( typeof reactionNodeSubValue !== "object")
+                result[key] = reactionNodeSubValue;
             else { // Otherwise just child reactionNodes
                 if (!result.children)
                     result.children = {}
-                result.children[key] = reactionNodeValue;
+                result.children[key] = reactionNodeSubValue;
             }
         }
         return result;
     }
-    /**
-     * Substitute state map into top level state
-     * @param topLevelState
-     * @param stateMap
-     * @param action
-     */
-    function mapState(rootState) {
-        return mapStateMap(rootState, action.stateMap);
-    }
 };
-
-function mapStateMap(rootState, stateMap) {
-    if (stateMap) {
-        var newState = Object.assign({}, rootState);
-        for (var stateProp in stateMap)
-            newState[stateProp] = evaluateState(stateMap[stateProp])
-        return newState;
-    } else
-        return rootState;
-
-    function evaluateState(stateSlices) {
-        var stateSlice = rootState
-        stateSlices.map((sliceComponent) => {
-            if (typeof sliceComponent == 'function') {
-                if (stateSlice instanceof Array)
-                    stateSlice = stateSlice.find((item, index) => sliceComponent.call(null, rootState, item, index));
-                else {
-                    var stateSliceProps = Object.getOwnPropertyNames(stateSlice);
-                    var stateSliceProp = stateSliceProps.find((prop)=> sliceComponent.call(null, rootState, stateSlice[prop]))
-                    stateSlice = stateSlice[stateSliceProp];
-                }
-            } else {
-                stateSlice = stateSlice[sliceComponent];
-            }
-            return undefined; // Not interested in results of map
-        });
-        return stateSlice;
-    }
-}
-

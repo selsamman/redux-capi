@@ -3,7 +3,7 @@ import { createRenderer } from 'react-test-renderer/shallow';
 import {applyMiddleware, createStore} from "redux";
 import {createAPI, reducer} from "../src";
 import ReduxThunk from "redux-thunk";
-import {matrixAPISpec} from "./api/matrix";
+import {matrixAPISpec} from "./matrix_row_col";
 const renderer = createRenderer();
 const defaultShape = {matrix: {rows: []}};
 describe('render', () => {

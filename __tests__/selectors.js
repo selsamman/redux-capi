@@ -1,91 +1,93 @@
 import { createAPI, reducer } from '../src';
 import { createStore, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk';
-import {matrixAPISpec, matrixCalled} from './api/matrix';
-
-const defaultShape = {matrix: {rows: []}};
 let setState;
 let store;
+let selectorCalled = 0;
+let memoSelectorCalled = 0;
+const apiSpec = {
+    redactions: {
+        increment: (amount) => ({
+            count: {set: (state) => state.count + (amount || 1)}
+        })
+    },
+    selectors: {
+        count: (state) => {
+            selectorCalled++;
+            return state.count;
+        },
+        memoCount: [
+            (selector, api) => selector(api.count),
+            (count) => {
+                memoSelectorCalled++;
+                return count
+            }
+        ]
+    }
+}
 
 function getAPI (newStore, shape) {
-    store = newStore ? createStore(reducer, shape || defaultShape, applyMiddleware(ReduxThunk)) : store;
-    const api = createAPI(matrixAPISpec);
+    store = newStore ? createStore(reducer, {count: 0}, applyMiddleware(ReduxThunk)) : store;
+    const api = createAPI(apiSpec);
     api.mount(store);
     return api;
 }
 describe('CAPI', () => {
     describe('bindAPI', () => {
-        it('can setup componentContext', () => {
+        it('create api context', () => {
             const api = getAPI(true);
             const apiContext = api._getContext();
-            expect(typeof apiContext.setValue).toBe("function");
-            expect(typeof apiContext.addRow).toBe("function");
-            expect(typeof apiContext.set).toBe("function");
-            expect(typeof Object.getOwnPropertyDescriptor(apiContext, 'matrix').get).toBe("function");
+            expect(typeof apiContext.increment).toBe("function");
+            expect(typeof Object.getOwnPropertyDescriptor(apiContext, 'count').get).toBe("function");
+            expect(typeof Object.getOwnPropertyDescriptor(apiContext, 'memoCount').get).toBe("function");
             expect(apiContext.__store__).toBe(api._getStore());
         })
-        it('can create api', () => {
+        it('create component context', () => {
             const api = getAPI(true);
             const component = {setState(state) {setState = state}};
             const componentContext = api({},component);
-            expect(typeof componentContext.setValue).toBe("function");
-            expect(typeof componentContext.addRow).toBe("function");
-            expect(typeof componentContext.set).toBe("function");
-            expect(typeof Object.getOwnPropertyDescriptor(componentContext.__proto__, 'matrix').get).toBe("function");
+            expect(typeof componentContext.increment).toBe("function");
         })
 
         it('can track selectors', () => {
             const api = getAPI(true);
             const component = {setState(state) {setState = state}};
+            selectorCalled = 0;
             {
-                let {__selector_used__, matrix, set} = api({}, component);
-                expect(matrix.rows.length).toBe(0);
-                expect(__selector_used__['matrix'].rows.length).toBe(0);
-                set(0, 0, "zero-zero");
-                var foo = store.getState();
-                expect(api._getStore().getState().matrix.rows[0].cols[0]).toBe("zero-zero");
+                let {__selector_used__, count, increment} = api({}, component);
+                expect(selectorCalled).toBe(1);
+                expect(count).toBe(0);
+                expect(__selector_used__['count']).toBe(0);
+                expect(selectorCalled).toBe(1);
+                expect(setState).toBe(undefined);
+                increment();
+                expect(selectorCalled).toBe(2);  // store called and compare made
             } {
-                let {matrix} = api({}, component);;
-                expect(matrix.rows[0].cols[0]).toBe("zero-zero");
+                let {count} = api({}, component);;
+                expect(count).toBe(1);
+                expect(selectorCalled).toBe(3);
             }
         })
 
-        it('can insert', () => {
+        it('can track memo selectors', () => {
             const api = getAPI(true);
             const component = {setState(state) {setState = state}};
-            let selectorCalled;
+            memoSelectorCalled = 0;
             {
-                let {insertRowBefore, insertColBefore, setValue} = api({},component);
-                insertRowBefore(0);
-                insertColBefore(0, 0);
-                setValue(0, 0, "0-0");
+                let {__selector_used__, memoCount, increment} = api({}, component);
+                expect(memoSelectorCalled).toBe(1);
+                expect(memoCount).toBe(0);
+                expect(__selector_used__['memoCount']).toBe(0);
+                increment();
+                expect(memoSelectorCalled).toBe(1); // Because memo never examined since count changed
             } {
-                let {matrix, insertColAfter, setValue} = api({},component);
-                expect(matrix.rows[0].cols[0]).toBe("0-0");
-                expect(matrix.rows.length).toBe(1);
-
-                insertColAfter(0, 0);
-                setValue(0, 1, "0-1");
+                let {memoCount} = api({}, component);;
+                expect(memoCount).toBe(1);
+                expect(memoSelectorCalled).toBe(2);
             } {
-                let {matrix, insertRowAfter, insertColBefore, setValue} = api({},component);
-                expect(matrix.rows[0].cols[1]).toBe("0-1");
-                expect(matrix.rows.length).toBe(1);
-                expect(matrix.rows[0].cols.length).toBe(2);
-                insertRowAfter(0)
-                insertColBefore(1, 0);
-                selectorCalled = matrixCalled;
-                setValue(1, 0, "1-0");
-            } {
-                let {matrix} = api({},component);
-                expect(matrix.rows[1].cols[0]).toBe("1-0");
-                expect(matrix.rows.length).toBe(2);
-                expect(matrix.rows[1].cols.length).toBe(1);
-                expect(selectorCalled + 1).toBe(matrixCalled);
-                selectorCalled = matrixCalled;
-            } {
-                let {matrix} = api({},component);
-                expect(matrix.rows[1].cols[0]).toBe("1-0");
-                expect(selectorCalled).toBe(matrixCalled);
+                let {memoCount} = api({}, component);;
+                expect(memoCount).toBe(1);
+                expect(memoSelectorCalled).toBe(2);
             }
         })
     })
