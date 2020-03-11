@@ -1,33 +1,51 @@
-import React from 'react'
+import React, {Component} from 'react'
+import {createStore} from "redux";
 import { createRenderer } from 'react-test-renderer/shallow';
-import {applyMiddleware, createStore} from "redux";
-import {createAPI, reducer} from "../src";
-import ReduxThunk from "redux-thunk";
-import {matrixAPISpec} from "./matrix_row_col";
+import { createAPI, reducer } from '../src';
 const renderer = createRenderer();
-const defaultShape = {matrix: {rows: []}};
-describe('render', () => {
-    it('render', () => {
-         let store = createStore(reducer, defaultShape, applyMiddleware(ReduxThunk));
-         const api = createAPI(matrixAPISpec);
-         api.mount(store);
-         let mock = api.mock({matrix: {rows: [{ cols: ["foo"]}]}});
-         const Matrix = () => {
-             const {matrix, addCol} = api({});
-             return (
-             <ul>
-                 {matrix.rows.map((row, ix) =>
-                     <button key={ix + 1} onClick={()=>addCol(ix)}>{row.cols[0]}</button>
-                 )}
-             </ul>
-             )
-         }
-         renderer.render(<Matrix />);
-         const output = renderer.getRenderOutput();
-         expect(output.props.children.length).toBe(1);
-         expect(output.props.children[0].props.children).toBe("foo");
-         output.props.children[0].props.onClick({});
-         expect(mock.addCol.calls[0][0]).toBe(0);
-         api.unmock();
-     })
+const apiSpec = {
+    redactions: {
+        increment: (amount) => ({
+            count: {set: (state) => state.count + (amount || 1)}
+        })
+    },
+    selectors: {
+        count: (state) => state.count
+    }
+}
+describe('Component Testing', () => {
+    it('works end to end in a function', () => {
+        const api = createAPI(apiSpec).mount(createStore(reducer, {count: 34}));
+        const renderCount = 0;
+        const Counter = () => {
+            const {count, increment} = api({});
+            return (
+                <button onClick={()=>increment(2)}>{count}</button>
+            )
+        }
+        renderer.render(<Counter />);
+        let output = renderer.getRenderOutput();
+        expect(output.props.children).toBe(34);
+        output.props.onClick({});
+        output = renderer.getRenderOutput();
+        expect(output.props.children).toBe(36);
+    })
+    it('works end to end in a class', () => {
+        const api = createAPI(apiSpec).mount(createStore(reducer, {count: 34}));
+        const renderCount = 0;
+        class Counter extends Component {
+            render () {
+                const {count, increment} = api({}, this);
+                return (
+                    <button onClick={()=>increment(2)}>{count}</button>
+                )
+            }
+        }
+        renderer.render(<Counter />);
+        let output = renderer.getRenderOutput();
+        expect(output.props.children).toBe(34);
+        output.props.onClick({});
+        output = renderer.getRenderOutput();
+        expect(output.props.children).toBe(36);
+    })
 })

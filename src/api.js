@@ -136,7 +136,9 @@ export const createAPI = (spec) => {
         bindFunctions(context);
         context.__render_count__ = 0;
         context.__component_instance__ = componentSequence++;
-         context.__force_render__ = () => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [, setSeq] = useState(1);
+        context.__force_render__ = () => {
             trace.log("force render Component " + context.__component_instance__+ " state " + context.__render_count__)
             setSeq(context.__render_count__);
         }
@@ -146,8 +148,6 @@ export const createAPI = (spec) => {
 
     // Set up a set state function that can trigger a render by modifying the state
     function manageFunctionSubscriptions (context) {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [, setSeq] = useState(1);
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
             return () => {
