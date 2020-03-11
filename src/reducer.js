@@ -121,7 +121,27 @@ export const reducer = (rootState, action) => {
                 reactionNodeValue = reactionNode[reactionNodeKey][1];
         }
 
+        if (reactionNodeValue['where'] && typeof reactionNodeValue['where'] === "function") {
+            if (typeof propOrIndex !== "number") // An array?
+                // Push this reaction node into children to be evaluated as array elements are stepped through
+                return {children: reactionNode}
+
+            // Otherwise and array instance and we eveluate if this is the correct instance
+            if (!reactionNodeValue['where'].call(null, rootState, element, propOrIndex, action.context))
+                return null;
+
+            if (reactionNodeValue['select'])
+                if (reactionNodeValue['select']['where'])
+                    return {children: {_:reactionNodeValue['select']}}
+                else
+                    reactionNodeValue = reactionNodeValue['select'];
+        }
+
         for (let key in reactionNodeValue) {
+
+            if (key === 'where')
+                continue; // already processed
+
             const reactionNodeSubValue = reactionNodeValue[key];
 
             // These are commands to be executed

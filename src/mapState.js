@@ -12,6 +12,9 @@ export function mapStateObjToArray(map) {
             if (level instanceof Array) {
                 arrayMap.push(level[0])
                 processLevel(level[1])
+            } else if (level.where) {
+                arrayMap.push(level.where)
+                processLevel(level.select);
             } else {
                 const props = Object.getOwnPropertyNames(level);
                 if (props.length > 1)

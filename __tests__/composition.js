@@ -43,9 +43,9 @@ const ComposedSpec = [
             CounterSpecPart2,
         ],
          mount: {
-            multi: [
-                (state, item, ix, api) => api.counterIx === ix
-            ]
+            multi: {
+                where: (state, item, ix, api) => api.counterIx === ix
+            }
         },
     }
 ]

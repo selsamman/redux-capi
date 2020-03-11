@@ -1,6 +1,6 @@
 {
   "name": "redux-capi",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": false,
   "main": "lib/index.js",
   "scripts": {
