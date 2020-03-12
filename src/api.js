@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import {mapStateObjToArray, mapStateArrayToObj, combineStateMapArray, mapStateMap} from './mapState';
 let componentSequence = 1;
-export const trace = {log(){}};
+export const trace = {log: ()=>{}};
 
 /*
 createAPI will create context for the api itself that has all of the redaction, selectors, thunks and maps as
@@ -44,7 +44,7 @@ export const createAPI = (spec) => {
 
         function assignProps(context, contextProps) {
             for (let prop in contextProps)
-                if (context[prop])
+                if (context[prop] && context[prop].__root_context__)
                     assignProps(context[prop], contextProps[prop])
                 else
                     context[prop] = contextProps[prop];
@@ -137,18 +137,18 @@ export const createAPI = (spec) => {
         context.__render_count__ = 0;
         context.__component_instance__ = componentSequence++;
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [, setSeq] = useState(1);
-        context.__force_render__ = () => {
-            trace.log("force render Component " + context.__component_instance__+ " state " + context.__render_count__)
-            setSeq(context.__render_count__);
-        }
+
         trace.log("New Component " + context.__component_instance__ + " props:" + JSON.stringify(contextProps));
         return context;
     }
 
     // Set up a set state function that can trigger a render by modifying the state
     function manageFunctionSubscriptions (context) {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [, setSeq] = useState(0);
+        context.__force_render__ = () => {
+            trace.log("force render Component " + context.__component_instance__+ " state " + context.__render_count__)
+            setSeq(context.__render_count__);
+        }       // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
             return () => {
                 freeContext(context);
@@ -157,7 +157,7 @@ export const createAPI = (spec) => {
                         context.__store_state_subscription__();
                     context.__store_state_subscription__ = undefined;
                     for (let prop in context)
-                        if (context[prop].__root_context__)
+                        if (context[prop] && context[prop].__root_context__)
                             freeContext(context[prop]);
                 }
             };
@@ -195,11 +195,14 @@ export const createAPI = (spec) => {
         }
         return context;
     }
-    function createContext(apiContext) {
+    function createContext(apiContext, rootContext) {
         let context = Object.create(apiContext);
+        rootContext = rootContext || context;
         for (let prop in apiContext)
-            if (apiContext[prop] && apiContext[prop].__root_context__)
-                    context[prop] = createContext(apiContext[prop]);
+            if (apiContext[prop] && apiContext[prop].__root_context__) {
+                    context[prop] = createContext(apiContext[prop], rootContext);
+                    context[prop].__root_context__ = rootContext;
+            }
         return context;
     }
 

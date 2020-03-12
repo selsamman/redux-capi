@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {createStore} from "redux";
 import { createRenderer } from 'react-test-renderer/shallow';
-import { createAPI, reducer } from '../src';
+import { createAPI, reducer, trace } from '../src';
 const renderer = createRenderer();
 const apiSpec = {
     redactions: {
@@ -13,6 +13,7 @@ const apiSpec = {
         count: (state) => state.count
     }
 }
+trace.log = (X)=>{console.log(X)};
 describe('Component Testing', () => {
     it('works end to end in a function', () => {
         const api = createAPI(apiSpec).mount(createStore(reducer, {count: 34}));
