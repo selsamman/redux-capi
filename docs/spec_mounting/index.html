@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Mounting a spec · redux-capi</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="In redux you can combine reducers and made them apply to specific parts of the state by using combineReducers.  The equivalent functionality in redux-capi is called mounting though it can do much more.  Mounting is establishing a state path that is the starting point (mount point) for an API spec.  It can be specified:"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Mounting a spec · redux-capi"/><meta property="og:type" content="website"/><meta property="og:url" content="https://selsamman.github.io/redux-capi/"/><meta property="og:description" content="In redux you can combine reducers and made them apply to specific parts of the state by using combineReducers.  The equivalent functionality in redux-capi is called mounting though it can do much more.  Mounting is establishing a state path that is the starting point (mount point) for an API spec.  It can be specified:"/><meta property="og:image" content="https://selsamman.github.io/redux-capi/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://selsamman.github.io/redux-capi/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/redux-capi/img/capi.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/redux-capi/js/scrollSpy.js"></script><link rel="stylesheet" href="/redux-capi/css/main.css"/><script src="/redux-capi/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/redux-capi/"><img class="logo" src="/redux-capi/img/capi.ico" alt="redux-capi"/><h2 class="headerTitleWithLogo">redux-capi</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"></ul></nav></div></header></div></div><div class="navPusher singleRowMobileNav"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>API Specs</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro">What it is</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro_usage">Usage</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro_rationale">Rationale</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro_context">Context</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">API Specs</h3><ul class=""><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec">API Spec</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_redactions">Redactions</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_selectors">Selectors</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_thunks">Thunks</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/redux-capi/docs/spec_mounting">Mounting</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_composition">Composing</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reference</h3><ul class=""><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_createAPI">createAPI</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_api">API</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_mount">api.mount()</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_mocks">api.mock()</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_utility">Utilities</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Mounting a spec</h1></header><article><div><span><p>In redux you can combine reducers and made them apply to specific parts of the state by using combineReducers.  The equivalent functionality in redux-capi is called mounting though it can do much more.  Mounting is establishing a state path that is the starting point (mount point) for an API spec.  It can be specified:</p>
+<ul>
+<li>When you mount the api into the store</li>
+<li>As part of declaring the spec though usually that would be when composing a spec from other specs
+The state graph looks exactly like the schema in a redaction except that the last property is set to the boolean true value.</li>
+</ul>
+<pre><code class="hljs"><span class="hljs-string">mountPoint</span> <span class="hljs-string">=</span> <span class="hljs-string">{</span>
+    <span class="hljs-attr">data:</span> <span class="hljs-string">{</span>
+        <span class="hljs-attr">telephones:</span> <span class="hljs-string">{</span>
+            <span class="hljs-attr">list:</span> <span class="hljs-literal">true</span>
+        <span class="hljs-string">}</span>
+    <span class="hljs-string">}</span>
+<span class="hljs-string">}</span>
+</code></pre>
+<p>When this mount point is applied to a spec as in</p>
+<pre><code class="hljs"><span class="hljs-selector-tag">myAPI</span><span class="hljs-selector-class">.mount</span>(<span class="hljs-selector-tag">store</span>, <span class="hljs-selector-tag">mountPoint</span>)
+</code></pre>
+<p>all references to the list property in spec will refer to <code>data.telephones.list</code>.  This means:</p>
+<ul>
+<li>The <code>list</code> property in the schema in all redactions</li>
+<li>Any state passed to the functions within the schema will be relative '''list''' rather than <code>data.telephones.list</code></li>
+</ul>
+<p>This means that the spec can be completely unaware of where exactly in the state shape the properties it is dealing with actually reside.  This makes it possible to re-use specs and to organize state shape in a large application without naming conflicts.</p>
+<h3><a class="anchor" aria-hidden="true" id="using-arrays-in-mount-points"></a><a href="#using-arrays-in-mount-points" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using Arrays in Mount Points</h3>
+<p>There may be times when you want to use spec and mount it into an array element.  Suppose you have multiple lists and a current one.  You want the spec to only apply to the curren one.  In that case you can use  <strong>where</strong> just as you would in a redaction to qualify which element of the array the spec is to apply to.</p>
+<pre><code class="hljs">mountPoint = {
+    todoLists: {
+         where: (<span class="hljs-keyword">state</span>, item, ix, api) =&gt; <span class="hljs-keyword">state</span>.currentListIx === ix
+    }
+}
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/redux-capi/docs/spec_thunks"><span class="arrow-prev">← </span><span>Thunks</span></a><a class="docs-next button" href="/redux-capi/docs/spec_composition"><span>Composing</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/redux-capi/" class="nav-home"><img src="/redux-capi/img/capi.ico" alt="redux-capi" width="66" height="58"/></a><div><h5>Docs</h5><a href="/redux-capi/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/redux-capi/docs/en/doc2.html">Guides (or other categories)</a><a href="/redux-capi/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/redux-capi/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/redux-capi/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/redux-capi/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Sam Elsamman</section></footer></div></body></html>
