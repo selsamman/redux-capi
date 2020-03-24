@@ -71,7 +71,7 @@ renderer.render(&lt;Counter /&gt;);
 <span class="hljs-keyword">const</span> output = renderer.getRenderOutput();
 expect(output.props.children[<span class="hljs-number">2</span>].props.children).toBe(<span class="hljs-number">34</span>);
 </code></pre>
-<p>mock returns a mock context which is used to analyze calls that the component may make in response to clicks.  The context contains a property for each thunk and redaction which will contain a two dimenional array.  The first dimension is sequence of the call and the second is the arguments passed.</p>
+<p>mock returns a mock context which is used to analyze calls that the component may make in response to clicks.  The context contains a property for each thunk and redaction which will contain a two dimensional array.  The first dimension is sequence of the call and the second is the arguments passed.</p>
 <pre><code class="hljs"><span class="hljs-selector-tag">output</span><span class="hljs-selector-class">.props</span><span class="hljs-selector-class">.children</span><span class="hljs-selector-attr">[0]</span><span class="hljs-selector-class">.props</span><span class="hljs-selector-class">.onClick</span>({});
 <span class="hljs-selector-tag">output</span><span class="hljs-selector-class">.props</span><span class="hljs-selector-class">.children</span><span class="hljs-selector-attr">[1]</span><span class="hljs-selector-class">.props</span><span class="hljs-selector-class">.onClick</span>({});
 <span class="hljs-selector-tag">expect</span>(<span class="hljs-selector-tag">mock</span><span class="hljs-selector-class">.increment</span><span class="hljs-selector-class">.calls</span><span class="hljs-selector-class">.length</span>)<span class="hljs-selector-class">.toBe</span>(1);

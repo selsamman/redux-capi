@@ -55,18 +55,18 @@
               }
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Redactions</h1></header><article><div><span><p>Redactions are self-reducing actions that contain a state schema which defines the path to a particular property and provides a function for returning a mutated value for that property.</p>
-<p>The redaction is the value of a property which determines the name of the self-dispatching function that will be created as a result of the redaction specification.  The function is passed the arguments that consumer of the redaction passes to the function and it returns a schema.</p>
+<p>A redaction is a property with a function as the value.  The name of the property is the name of the self-dispatching function that will be created in the API.  The function is passed the arguments that consumer of the redaction passes to the function.</p>
 <pre><code class="hljs">functionName: <span class="hljs-function"><span class="hljs-params">(arguments)</span> =&gt;</span> (returns schema)
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="schema"></a><a href="#schema" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Schema</h3>
-<p>The redaction function returns a schema.  The schema defines the path to state properties and defines how those properties will be affected.  The path is defined as a hierarchy of objects where each property name corresponds to a property in the state hirarchy .  The hierarchy continues with sub-objects until and an object that contains properties with functions attached is reached.  Such an object contains functions which determine what to do based on their property name.  They include:</p>
+<p>The schema defines the path to state properties and defines how those properties will be affected.  The path is defined as a hierarchy of objects where each property name corresponds to a property in the state hierarchy.  The hierarchy continues with subordinate objects until and an object that contains properties with functions attached is reached.  Such an object contains functions which determine what to do based on their property name.  They include:</p>
 <ul>
 <li>Selecting an array element using <strong>where</strong></li>
 <li>Inserting or appending an element to array with <strong>insert</strong> and <strong>append</strong></li>
 <li>Setting a value for a property with <strong>set</strong></li>
 <li>Assigning partial properties to an object with <strong>assign</strong></li>
 </ul>
-<p>Because the entire schema is returned by the redaction function which is passed the arguments from consumer the functions may reference thes arguments as a closure.</p>
+<p>Because the entire schema is returned by the redaction function which is passed the arguments from consumer the functions may reference these arguments as a closure.</p>
 <pre><code class="hljs">setFilter: <span class="hljs-function"><span class="hljs-params">(filterValue)</span> =&gt;</span> (
 {
    widgetList: {
@@ -88,9 +88,9 @@
 </code></pre>
 <p>The arguments are:</p>
 <ul>
-<li><strong>state</strong> the previous state</li>
-<li><strong>state</strong> the previous state of the particular state property</li>
-<li><strong>context</strong> the context from which context properties can be extracted</li>
+<li><strong>state</strong> the previous value of the state</li>
+<li><strong>property</strong> the previous value of the particular state property</li>
+<li><strong>context</strong> the component instance context</li>
 </ul>
 <p><strong>set</strong> mutates the state property to the new value returned from the function while <strong>assign</strong> expects an object and the individual propeties present are mutated (Object.assign)</p>
 <h3><a class="anchor" aria-hidden="true" id="append"></a><a href="#append" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Append</h3>
@@ -100,10 +100,10 @@
 </code></pre>
 <p>The arguments are:</p>
 <ul>
-<li><strong>state</strong> the previous state of the particular state property</li>
-<li><strong>context</strong> the context from which context properties can be extracted
-The function returns a new array element to be appended.</li>
+<li><strong>state</strong> the previous value of the state</li>
+<li><strong>context</strong> the component instance context</li>
 </ul>
+<p>The function returns a new array element to be appended.</p>
 <h3><a class="anchor" aria-hidden="true" id="insert"></a><a href="#insert" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Insert</h3>
 <pre><code class="hljs">state_array_property_name: {
     before: () =&gt; (<span class="hljs-keyword">state</span>, context) =&gt; (return index value)
@@ -118,14 +118,14 @@ The function returns a new array element to be appended.</li>
 </code></pre>
 <p>The arguments are:</p>
 <ul>
-<li><strong>state</strong> the previous state of the particular state property</li>
-<li><strong>context</strong> the context from which context properties can be extracted
-The <strong>after</strong> function returns the index in the array after which the element is to be inserted and the **before function returns the index in the array before which the element is to be inserted</li>
+<li><strong>state</strong> the previous value of the state</li>
+<li><strong>context</strong> the component instance context</li>
 </ul>
+<p>The <strong>after</strong> function returns the index in the array after which the element is to be inserted and the <strong>before</strong> function returns the index in the array before which the element is to be inserted</p>
 <h3><a class="anchor" aria-hidden="true" id="where"></a><a href="#where" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Where</h3>
 <p>When a state property is an array and only one element is to be affected the <strong>where</strong> is used to select that function.</p>
 <pre><code class="hljs">state_array_property_name: {
-    <span class="hljs-attr">where</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-function">(<span class="hljs-params">state, element, index, context</span>) =&gt;</span> (boolean <span class="hljs-keyword">return</span> value)
+    where: (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
     action_to_be_taken ...
 }
 </code></pre>
@@ -144,7 +144,7 @@ The <strong>after</strong> function returns the index in the array after which t
 </ul>
 <p><strong>select</strong> allows you to select that element and continue the hierarchy</p>
 <pre><code class="hljs">state_array_property_name: {
-    where: () =&gt; (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
+    where: (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
     select: {
         <span class="hljs-keyword">state</span> heirarchy or another where
     }
@@ -152,16 +152,16 @@ The <strong>after</strong> function returns the index in the array after which t
 </code></pre>
 <p>If the next level is another array you can use <strong>where</strong></p>
 <pre><code class="hljs">state_array_property_name: {
-    where: () =&gt; (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
+    where: (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
     select: {
-        where: () =&gt; (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
+        where: (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
         <span class="hljs-keyword">state</span> heirarchy or another where
     }
 }
 </code></pre>
 <p>Otherwise it would refer to a state property</p>
 <pre><code class="hljs">state_array_property_name: {
-    where: () =&gt; (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
+    where: (<span class="hljs-keyword">state</span>, element, index, context) =&gt; (boolean return value)
     select: {
         state_property_name: {
             <span class="hljs-keyword">state</span> heirarchy or other action
