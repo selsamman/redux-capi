@@ -40,7 +40,7 @@ describe('CAPI', () => {
             expect(typeof apiContext.increment).toBe("function");
             expect(typeof Object.getOwnPropertyDescriptor(apiContext, 'count').get).toBe("function");
             expect(typeof Object.getOwnPropertyDescriptor(apiContext, 'memoCount').get).toBe("function");
-            expect(apiContext.__store__).toBe(api._getStore());
+            expect(apiContext.__store__).toBe(api.getStore());
         })
         it('create component context', () => {
             const api = getAPI(true);

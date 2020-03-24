@@ -90,7 +90,7 @@ export const createAPI = (spec) => {
     }
 
     api._getContext = () => apiContext; // For testing
-    api._getStore = () => apiContext.__store__;
+    api.getStore = () => apiContext.__store__;
 
     return api;
 
