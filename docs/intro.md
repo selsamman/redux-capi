@@ -3,12 +3,12 @@ id: intro
 title: What is redux-capi?
 sidebar_label: What it is
 ---
-Redux-capi is alternative to react-redux.  It allows you to packages up actions, selectors and thunks as an API to be consumed by React components.  
+Redux-capi is alternative to react-redux.  It allows you to package up actions, selectors and thunks as an API to be consumed by React components.  
 
 Key features include:
 * Reducers and actions are automatically generated from a spec
-* API implementation is completely isolated from React component structure
-* API implementation can be re-used across multiple components
+* API implementation is completely isolated from the React component structure
+* API implementation can be reused across multiple components
 * API and components can be tested independently
 * Same pattern used in both function-based and class-based components 
 
@@ -52,7 +52,7 @@ const Counter = () => {
     return (
          <view>
             <button onClick={ increment }>+1</button>
-            <button onClick={ () => incrementN(20)}>+20</button>
+            <button onClick={ () => incrementN(20) }>+20</button>
             <text>{count}</text>
         </view>
     )
@@ -82,7 +82,7 @@ describe('Counter API Testing', () => {
 });
 ```
 ### Test the Consuming Component
-And with the ability to mock the API calls and results, you can test your component on it's own without invoking the API.  You provide values for selectors and redu-capi will record all calls to thunks and redactions along with the arguments passed.
+With the ability to mock the API, you can test your component on it's own without invoking the API itself.  You provide values for selectors and redu-capi will record all calls to thunks and redactions along with the arguments passed.
 ```
 describe('Counter Component Testing', () => {
     it('render', () => {

@@ -23,7 +23,7 @@ const output = renderer.getRenderOutput();
 expect(output.props.children[2].props.children).toBe(34);
 ```
 
-mock returns a mock context which is used to analyze calls that the component may make in response to clicks.  The context contains a property for each thunk and redaction which will contain a two dimenional array.  The first dimension is sequence of the call and the second is the arguments passed.
+mock returns a mock context which is used to analyze calls that the component may make in response to clicks.  The context contains a property for each thunk and redaction which will contain a two dimensional array.  The first dimension is sequence of the call and the second is the arguments passed.
 ```
 output.props.children[0].props.onClick({});
 output.props.children[1].props.onClick({});

@@ -44,7 +44,7 @@ In your top level file where the store is defined, the API needs to be mounted i
 ```
 import { myAPI } from 'myapi';
 import { reducer } from 'redux-capi';
-const store = createStore(reducer, initialStat, eapplyMiddleware(ReduxThunk))
+const store = createStore(reducer, initialStat, applyMiddleware(ReduxThunk))
 api.mount(store, mountSpec);
 ```
 Now any component can import and use the spec in either the render method for class-based components or in the component function.

@@ -21,7 +21,7 @@ Every property you define under redactions, selectors and thunks results in a pr
 ***Selectors*** result in properties that have the selected value.  
 
 ***Thunks*** result in functions that use the redux-thunk mechanism but are wrapped to provide the context
-### Breaking the Apec into Smaller Pieces
+### Breaking the Spec into Smaller Pieces
 Because the context is passed to most functions in the spec there is no need for functions to reference the spec itself.  Instead they reference the results of the API just as a component would reference them.  This means that you can define them in multiple files and group them together in whatever way makes sense for the logic of your API.
 ### Combining the Pieces with Arrays
 You can combine subject areas like this:
@@ -35,4 +35,4 @@ const part2 = {
     selectors: some selectors ...
 }
 myAPI = createAPI([part1, part2])     
-
+```
