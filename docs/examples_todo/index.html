@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Todo List · redux-capi</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="The classic example for redux is the todo List.  We will go through it and compare it with the standard redux implementation."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Todo List · redux-capi"/><meta property="og:type" content="website"/><meta property="og:url" content="https://selsamman.github.io/redux-capi/"/><meta property="og:description" content="The classic example for redux is the todo List.  We will go through it and compare it with the standard redux implementation."/><meta property="og:image" content="https://selsamman.github.io/redux-capi/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://selsamman.github.io/redux-capi/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/redux-capi/img/capi.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/redux-capi/js/scrollSpy.js"></script><link rel="stylesheet" href="/redux-capi/css/main.css"/><script src="/redux-capi/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/redux-capi/"><img class="logo" src="/redux-capi/img/capi.ico" alt="redux-capi"/><h2 class="headerTitleWithLogo">redux-capi</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"></ul></nav></div></header></div></div><div class="navPusher singleRowMobileNav"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Todo List</h1></header><article><div><span><p>The classic example for redux is the todo List.  We will go through it and compare it with the standard redux implementation.</p>
+<h1><a class="anchor" aria-hidden="true" id="application-logic-for-state"></a><a href="#application-logic-for-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Application Logic for State</h1>
+<p>In the standard redux implementation you have state-related code in</p>
+<ul>
+<li>The reducers, suplemented by actions and their related constants</li>
+<li>In high order components which implement selectors</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="standard-redux"></a><a href="#standard-redux" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Standard Redux</h2>
+<h3><a class="anchor" aria-hidden="true" id="actions"></a><a href="#actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Actions</h3>
+<p>You have the actions:</p>
+<pre><code class="hljs">let nextTodoId = 0
+<span class="hljs-builtin-name">export</span> const addTodo = text =&gt; ({
+  type: <span class="hljs-string">'ADD_TODO'</span>,
+  id: nextTodoId++,
+  text
+})
+
+<span class="hljs-builtin-name">export</span> const setVisibilityFilter =<span class="hljs-built_in"> filter </span>=&gt; ({
+  type: <span class="hljs-string">'SET_VISIBILITY_FILTER'</span>,
+ <span class="hljs-built_in"> filter
+</span>})
+
+<span class="hljs-builtin-name">export</span> const toggleTodo = id =&gt; ({
+  type: <span class="hljs-string">'TOGGLE_TODO'</span>,
+  id
+}) 
+</code></pre>
+<p>Normally you have constants rather than strings for action types but in the interest of brevity the standard example omits that.  It would also be preferable for the nextTodoId to be part of the state so that if the state is persisted you don't lose the high water mark.</p>
+<h3><a class="anchor" aria-hidden="true" id="reducers"></a><a href="#reducers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reducers</h3>
+<p>The root reducers combines reducers for the todo list and for setting the filter of what todos are to be displayed</p>
+<pre><code class="hljs"><span class="hljs-builtin-name">export</span><span class="hljs-built_in"> default </span>combineReducers({
+  todos,
+  visibilityFilter
+})
+</code></pre>
+<p>You have the reducers for the todo list that supports adding and toggling</p>
+<pre><code class="hljs">const todos = (<span class="hljs-keyword">state</span> = [], action) =&gt; {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return [
+        ...<span class="hljs-keyword">state</span>,
+        {
+          id: action.id,
+          text: action.text,
+          completed: false
+        }
+      ]
+    case 'TOGGLE_TODO':
+      return <span class="hljs-keyword">state</span>.map(todo =&gt;
+        (todo.id === action.id)
+          ? {...todo, completed: !todo.completed}
+          : todo
+      )
+    <span class="hljs-keyword">default</span>:
+      return <span class="hljs-keyword">state</span>
+  }
+}
+</code></pre>
+<p>and for setting visibility:</p>
+<pre><code class="hljs">const visibilityFilter = (<span class="hljs-keyword">state</span> = VisibilityFilters.SHOW_ALL, action) =&gt; {
+  switch (action.type) {
+    case 'SET_VISIBILITY_FILTER':
+      return action.filter
+    <span class="hljs-keyword">default</span>:
+      return <span class="hljs-keyword">state</span>
+  }
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="containers"></a><a href="#containers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Containers</h3>
+<p>In standard redux there are two ways to bind redux to your visual components</p>
+<ul>
+<li>In class-based components you have higher order components which use redux connect to bind the state to component properties.  Usually some logic is present such as for selectors</li>
+<li>In function-based components that use hooks the best practice is to have use functions that implement the hooks and return data and functions for manipulating the store.  This is closer to the pattern one would use with redux-capi</li>
+</ul>
+<p>The standard implementation has a container for retreiving the todoList which would be</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> getVisibleTodos = <span class="hljs-function">(<span class="hljs-params">todos, filter</span>) =&gt;</span> {
+  <span class="hljs-keyword">switch</span> (filter) {
+    <span class="hljs-keyword">case</span> VisibilityFilters.SHOW_ALL:
+      <span class="hljs-keyword">return</span> todos
+    <span class="hljs-keyword">case</span> VisibilityFilters.SHOW_COMPLETED:
+      <span class="hljs-keyword">return</span> todos.filter(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.completed)
+    <span class="hljs-keyword">case</span> VisibilityFilters.SHOW_ACTIVE:
+      <span class="hljs-keyword">return</span> todos.filter(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> !t.completed)
+    <span class="hljs-keyword">default</span>:
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Unknown filter: '</span> + filter)
+  }
+}
+
+<span class="hljs-keyword">const</span> mapStateToProps = <span class="hljs-function"><span class="hljs-params">state</span> =&gt;</span> ({
+  todos: getVisibleTodos(state.todos, state.visibilityFilter)
+})
+
+<span class="hljs-keyword">const</span> mapDispatchToProps = <span class="hljs-function"><span class="hljs-params">dispatch</span> =&gt;</span> ({
+  toggleTodo: <span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> dispatch(toggleTodo(id))
+})
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TodoList)
+</code></pre>
+<p>This contains a selector with the logic for selecting the appropriate todos and a binding to the toggleTodo function.  The connect function takes the TodoList class as a parameter such that it becomes a higher order component for TodoList, called VisibleTodoList which is then used in place of TodoList.</p>
+<p>There is also a container for managing the filter buttons that determine which todos will be displayed:</p>
+<pre><code class="hljs">const mapStateToProps = (<span class="hljs-name">state</span>, ownProps) =&gt; ({
+  active: ownProps.filter === state.visibilityFilter
+})
+
+const mapDispatchToProps = (<span class="hljs-name">dispatch</span>, ownProps) =&gt; ({
+  onClick: () =&gt; dispatch(<span class="hljs-name">setVisibilityFilter</span>(<span class="hljs-name">ownProps</span>.filter))
+})
+
+export default connect(
+  <span class="hljs-name">mapStateToProps</span>,
+  mapDispatchToProps
+)(<span class="hljs-name">Link</span>)
+</code></pre>
+<p>It contains a selector to determine if the link should be active (because it represents the current filter criteria) and a binding to the action for setting the current filter.  It becomes a higher order component of Link.</p>
+<h2><a class="anchor" aria-hidden="true" id="redux-capi"></a><a href="#redux-capi" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Redux-capi</h2>
+<p>In redux-capi all of the above is reduced to an api</p>
+<pre><code class="hljs"><span class="hljs-attr">export</span> <span class="hljs-string">const todoAPI = createAPI({</span>
+    <span class="hljs-attr">redactions</span>: <span class="hljs-string">todoRedactions,</span>
+    <span class="hljs-attr">selectors</span>: <span class="hljs-string">todoSelectors,</span>
+<span class="hljs-attr">})</span>
+</code></pre>
+<p>which consists of redactions:</p>
+<pre><code class="hljs">export const todoRedactions = {
+
+    addTodo: (text) =&gt; ({
+        nextId: {
+            <span class="hljs-built_in">set</span>: (<span class="hljs-keyword">state</span>) =&gt; <span class="hljs-keyword">state</span>.nextId +<span class="hljs-number">1</span>
+        },
+        todos: {
+            append: (<span class="hljs-keyword">state</span>) =&gt; ({text, completed: false, id: <span class="hljs-keyword">state</span>.nextId}),
+        },
+    }),
+
+    toggleTodo: () =&gt; ({
+        todos: {
+            where: (<span class="hljs-keyword">state</span>, item, ix, {id}) =&gt; item.id === id,
+            assign: (<span class="hljs-keyword">state</span>, todo) =&gt; ({completed: !todo.completed}),
+        }
+    }),
+
+    <span class="hljs-built_in">set</span>VisibilityFilter: (filter) =&gt; ({
+        visibilityFilter: {
+            <span class="hljs-built_in">set</span>: () =&gt; filter,
+        }
+    }),
+}
+</code></pre>
+<p>Note that in toggleTodo the id of the todo item is espected in the component context and is passed in when the API is used.</p>
+<p>There are selectors.</p>
+<pre><code class="hljs"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> todoSelectors = {
+
+    todos: <span class="hljs-function">(<span class="hljs-params">state</span>) =&gt;</span> state.todos,
+
+    visibilityFilter: <span class="hljs-function">(<span class="hljs-params">state</span>) =&gt;</span> state.visibilityFilter,
+
+    todo: [
+        <span class="hljs-function">(<span class="hljs-params">select, {id, todos}</span>) =&gt;</span> select(id, todos),
+        <span class="hljs-function">(<span class="hljs-params">id, todos</span>) =&gt;</span> todos.find(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.id === id)
+    ],
+
+    filteredTodos: [
+        <span class="hljs-function">(<span class="hljs-params">select, {visibilityFilter, todos}</span>) =&gt;</span> select(visibilityFilter, todos),
+        <span class="hljs-function">(<span class="hljs-params">visibilityFilter, todos</span>) =&gt;</span> {
+            <span class="hljs-keyword">switch</span> (visibilityFilter) {
+                <span class="hljs-keyword">case</span> VisibilityFilters.SHOW_ALL:
+                    <span class="hljs-keyword">return</span> todos
+                <span class="hljs-keyword">case</span>  VisibilityFilters.SHOW_COMPLETED:
+                    <span class="hljs-keyword">return</span> todos.filter(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.completed)
+                <span class="hljs-keyword">case</span> VisibilityFilters.SHOW_ACTIVE:
+                    <span class="hljs-keyword">return</span> todos.filter(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> !t.completed)
+                <span class="hljs-keyword">default</span>:
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Unknown filter: '</span> + visibilityFilter)
+            }
+        }
+    ],
+ }
+</code></pre>
+<p>Note that the todo selector selects an individual todo an expects the id to be in the component context. This example uses the longer form of memoized selectors.</p>
+<h3><a class="anchor" aria-hidden="true" id="component-structure"></a><a href="#component-structure" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Component Structure</h3>
+<p>There are no containers and the visual components simply use the parts of the API they need. The visual components are similar in structure but with one key difference.  In the classic redux example the TodoList component iterates through the todos and passes in all of the properties of each todo list item as well as functions it can use for toggling them.</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> TodoList = <span class="hljs-function">(<span class="hljs-params">{ todos, toggleTodo }</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+    {todos.map(todo =&gt;
+      <span class="hljs-tag">&lt;<span class="hljs-name">Todo</span>
+        <span class="hljs-attr">key</span>=<span class="hljs-string">{todo.id}</span>
+        {<span class="hljs-attr">...todo</span>}
+        <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> toggleTodo(todo.id)}
+      /&gt;
+    )}
+  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></span>
+)
+</code></pre>
+<p>In the redux-capi version only the id is passed to the Todo child</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> TodoList = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  <span class="hljs-keyword">const</span> { filteredTodos } = todoAPI();
+  <span class="hljs-keyword">return</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+      {filteredTodos.map(todo =&gt;
+        <span class="hljs-tag">&lt;<span class="hljs-name">Todo</span>
+          <span class="hljs-attr">key</span>=<span class="hljs-string">{todo.id}</span> <span class="hljs-attr">id</span>=<span class="hljs-string">{todo.id}</span>
+        /&gt;</span>
+      )}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span></span>
+  )
+}
+</code></pre>
+<p>The todo item is then responsible for handling all individual todo concerns interacting directly with the API.</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> Todo = <span class="hljs-function">(<span class="hljs-params">{ id }</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> {toggleTodo, todo } = todoAPI({<span class="hljs-attr">id</span>: id});
+    <span class="hljs-keyword">return</span> (
+      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span>
+        <span class="hljs-attr">onClick</span>=<span class="hljs-string">{toggleTodo}</span>
+        <span class="hljs-attr">style</span>=<span class="hljs-string">{{</span>
+          <span class="hljs-attr">textDecoration:</span> <span class="hljs-attr">todo.completed</span> ? '<span class="hljs-attr">line-through</span>' <span class="hljs-attr">:</span> '<span class="hljs-attr">none</span>'
+        }}
+      &gt;</span>
+        {todo.text}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></span>
+    )
+}
+</code></pre>
+<p>Finally there is AddTodo which is actually both a container and a visual component and illustrates a common style when one doesn't have logic to separate from a visual component.</p>
+<pre><code class="hljs">const AddTodo = ({ dispatch }) =&gt; {
+ let <span class="hljs-keyword">input</span>
+
+ <span class="hljs-keyword">return</span> (
+   &lt;div&gt;
+     &lt;form onSubmit={e =&gt; {
+       e.preventDefault()
+       <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">input</span>.<span class="hljs-keyword">value</span>.trim()) {
+         <span class="hljs-keyword">return</span>
+       }
+       dispatch(addTodo(<span class="hljs-keyword">input</span>.<span class="hljs-keyword">value</span>))
+       <span class="hljs-keyword">input</span>.<span class="hljs-keyword">value</span> = <span class="hljs-string">''</span>
+     }}&gt;
+       &lt;<span class="hljs-keyword">input</span> <span class="hljs-keyword">ref</span>={node =&gt; input = node} /&gt;
+       &lt;button <span class="hljs-keyword">type</span>="submit"&gt;
+         <span class="hljs-keyword">Add</span> Todo
+       &lt;/button&gt;
+     &lt;/form&gt;
+   &lt;/div&gt;
+ )
+}
+
+export <span class="hljs-keyword">default</span> <span class="hljs-keyword">connect</span>()(AddTodo)
+</code></pre>
+<p>The links for setting the filter are not hugely changed except that you place the testing of the filter and the actions for changing it in the Links themselves rather than splitting this across parent and child components as in the standard redux implementation.</p>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#standard-redux">Standard Redux</a><ul class="toc-headings"><li><a href="#actions">Actions</a></li><li><a href="#reducers">Reducers</a></li><li><a href="#containers">Containers</a></li></ul></li><li><a href="#redux-capi">Redux-capi</a><ul class="toc-headings"><li><a href="#component-structure">Component Structure</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/redux-capi/" class="nav-home"><img src="/redux-capi/img/capi.ico" alt="redux-capi" width="66" height="58"/></a><div><h5>Docs</h5><a href="/redux-capi/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/redux-capi/docs/en/doc2.html">Guides (or other categories)</a><a href="/redux-capi/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/redux-capi/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/redux-capi/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/redux-capi/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Sam Elsamman</section></footer></div></body></html>
