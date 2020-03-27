@@ -5,6 +5,10 @@
     "previous": "Previous",
     "tagline": "A redux state api for React components",
     "docs": {
+      "examples_todo": {
+        "title": "Todo List",
+        "sidebar_label": "Todo List"
+      },
       "intro_context": {
         "title": "Component Context",
         "sidebar_label": "Context"

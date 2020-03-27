@@ -56,7 +56,7 @@
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Mounting a spec</h1></header><article><div><span><p>In redux you can combine reducers and made them apply to specific parts of the state by using combineReducers.  The equivalent functionality in redux-capi is called mounting though it can do much more.  Mounting is establishing a state path that is the starting point (mount point) for an API spec.  It can be specified:</p>
 <ul>
-<li>When you mount the api into the store</li>
+<li>When you mount the API into the store</li>
 <li>As part of declaring the spec though usually that would be when composing a spec from other specs
 The state graph looks exactly like the schema in a redaction except that the last property is set to the boolean true value.</li>
 </ul>
@@ -74,11 +74,11 @@ The state graph looks exactly like the schema in a redaction except that the las
 <p>all references to the list property in spec will refer to <code>data.telephones.list</code>.  This means:</p>
 <ul>
 <li>The <code>list</code> property in the schema in all redactions</li>
-<li>Any state passed to the functions within the schema will be relative '''list''' rather than <code>data.telephones.list</code></li>
+<li>Any state passed to the functions within the schema will be relative <code>list</code> rather than <code>data.telephones.list</code></li>
 </ul>
 <p>This means that the spec can be completely unaware of where exactly in the state shape the properties it is dealing with actually reside.  This makes it possible to re-use specs and to organize state shape in a large application without naming conflicts.</p>
 <h3><a class="anchor" aria-hidden="true" id="using-arrays-in-mount-points"></a><a href="#using-arrays-in-mount-points" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using Arrays in Mount Points</h3>
-<p>There may be times when you want to use spec and mount it into an array element.  Suppose you have multiple lists and a current one.  You want the spec to only apply to the curren one.  In that case you can use  <strong>where</strong> just as you would in a redaction to qualify which element of the array the spec is to apply to.</p>
+<p>There may be times when you want to use spec and mount it into an array element.  Suppose you have multiple lists and a current one.  You want the spec to only apply to the current one.  In that case you can use  <strong>where</strong> just as you would in a redaction to qualify which element of the array the spec is to apply to.</p>
 <pre><code class="hljs">mountPoint = {
     todoLists: {
          where: (<span class="hljs-keyword">state</span>, item, ix, api) =&gt; <span class="hljs-keyword">state</span>.currentListIx === ix

@@ -9,7 +9,10 @@ const apiSpec = {
     redactions: {
         increment: (amount) => ({
             count: {set: (state) => state.count + (amount || 1)}
-        })
+        }),
+        incrementWithSelector: (amount) => ({
+            count: {set: (state, prop, {count}) => count + (amount || 1)}
+        }),
     },
     selectors: {
         count: (state) => {
@@ -88,6 +91,17 @@ describe('CAPI', () => {
                 let {memoCount} = api({}, component);;
                 expect(memoCount).toBe(1);
                 expect(memoSelectorCalled).toBe(2);
+            }
+        })
+        it('you cannot reference a selector in a redaction', () => {
+            const api = getAPI(true);
+            const component = {};
+            {
+                let {incrementWithSelector} = api({}, component);
+                expect(incrementWithSelector).toThrow();
+            } {
+                let {memoCount} = api({}, component);;
+                expect(memoCount).toBe(0);
             }
         })
     })
