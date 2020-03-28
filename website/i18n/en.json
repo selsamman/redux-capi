@@ -78,7 +78,8 @@
     "categories": {
       "Introduction": "Introduction",
       "API Specs": "API Specs",
-      "Reference": "Reference"
+      "Reference": "Reference",
+      "Examples": "Examples"
     }
   },
   "pages-strings": {

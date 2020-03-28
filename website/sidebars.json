@@ -2,6 +2,7 @@
   "TOC": {
     "Introduction": ["intro", "intro_usage", "intro_rationale", "intro_context"],
     "API Specs": ["spec", "spec_redactions", "spec_selectors", "spec_thunks", "spec_mounting", "spec_composition"],
-    "Reference": ["reference_createAPI", "reference_api","reference_mount", "reference_mocks", "reference_utility"]
+    "Reference": ["reference_createAPI", "reference_api","reference_mount", "reference_mocks", "reference_utility"],
+    "Examples" : ["examples_todo"]
   }
 }
