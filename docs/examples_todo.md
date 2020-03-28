@@ -9,7 +9,6 @@ In the standard redux implementation you have state-related code in
 * The reducers, suplemented by actions and their related constants
 * In high order components which implement selectors
 ## Standard Redux
-
 ### Actions
 You have the actions:
 ```
@@ -126,14 +125,17 @@ export default connect(
 ```
 It contains a selector to determine if the link should be active (because it represents the current filter criteria) and a binding to the action for setting the current filter.  It becomes a higher order component of Link.
 ## Redux-capi  
-In redux-capi all of the above is reduced to an api
+###API
+In redux-capi all of the above is reduced to an API specification
 ```
 export const todoAPI = createAPI({
     redactions: todoRedactions,
     selectors: todoSelectors,
 })
+
 ```
-which consists of redactions:
+###Redactions
+These redactions replace the actions and individual reducers
 ```
 export const todoRedactions = {
 
@@ -161,8 +163,8 @@ export const todoRedactions = {
 }
 ```
 Note that in toggleTodo the id of the todo item is espected in the component context and is passed in when the API is used.
-
-There are selectors.
+###Selectors
+The selectors are implemented as part of the API specification rather than in High Order Components.
 ```
 export const todoSelectors = {
 
@@ -239,30 +241,4 @@ const Todo = ({ id }) => {
     )
 }
 ```
- Finally there is AddTodo which is actually both a container and a visual component and illustrates a common style when one doesn't have logic to separate from a visual component.
- ```
-const AddTodo = ({ dispatch }) => {
-  let input
-
-  return (
-    <div>
-      <form onSubmit={e => {
-        e.preventDefault()
-        if (!input.value.trim()) {
-          return
-        }
-        dispatch(addTodo(input.value))
-        input.value = ''
-      }}>
-        <input ref={node => input = node} />
-        <button type="submit">
-          Add Todo
-        </button>
-      </form>
-    </div>
-  )
-}
-
-export default connect()(AddTodo)
-```
-The links for setting the filter are not hugely changed except that you place the testing of the filter and the actions for changing it in the Links themselves rather than splitting this across parent and child components as in the standard redux implementation.
+The complete source is in the todos sub-project in https://github.com/selsamman/redux-capi-examples
