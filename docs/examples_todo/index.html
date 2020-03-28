@@ -278,30 +278,4 @@ export default connect(
     )
 }
 </code></pre>
-<p>Finally there is AddTodo which is actually both a container and a visual component and illustrates a common style when one doesn't have logic to separate from a visual component.</p>
-<pre><code class="hljs">const AddTodo = ({ dispatch }) =&gt; {
- let <span class="hljs-keyword">input</span>
-
- <span class="hljs-keyword">return</span> (
-   &lt;div&gt;
-     &lt;form onSubmit={e =&gt; {
-       e.preventDefault()
-       <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">input</span>.<span class="hljs-keyword">value</span>.trim()) {
-         <span class="hljs-keyword">return</span>
-       }
-       dispatch(addTodo(<span class="hljs-keyword">input</span>.<span class="hljs-keyword">value</span>))
-       <span class="hljs-keyword">input</span>.<span class="hljs-keyword">value</span> = <span class="hljs-string">''</span>
-     }}&gt;
-       &lt;<span class="hljs-keyword">input</span> <span class="hljs-keyword">ref</span>={node =&gt; input = node} /&gt;
-       &lt;button <span class="hljs-keyword">type</span>="submit"&gt;
-         <span class="hljs-keyword">Add</span> Todo
-       &lt;/button&gt;
-     &lt;/form&gt;
-   &lt;/div&gt;
- )
-}
-
-export <span class="hljs-keyword">default</span> <span class="hljs-keyword">connect</span>()(AddTodo)
-</code></pre>
-<p>The links for setting the filter are not hugely changed except that you place the testing of the filter and the actions for changing it in the Links themselves rather than splitting this across parent and child components as in the standard redux implementation.</p>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/redux-capi/docs/reference_utility"><span class="arrow-prev">← </span><span>Utilities</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#standard-redux">Standard Redux</a><ul class="toc-headings"><li><a href="#actions">Actions</a></li><li><a href="#reducers">Reducers</a></li><li><a href="#containers">Containers</a></li></ul></li><li><a href="#redux-capi">Redux-capi</a><ul class="toc-headings"><li><a href="#component-structure">Component Structure</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/redux-capi/" class="nav-home"><img src="/redux-capi/img/capi.ico" alt="redux-capi" width="66" height="58"/></a><div><h5>Docs</h5><a href="/redux-capi/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/redux-capi/docs/en/doc2.html">Guides (or other categories)</a><a href="/redux-capi/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/redux-capi/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/redux-capi/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/redux-capi/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Sam Elsamman</section></footer></div></body></html>
