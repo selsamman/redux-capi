@@ -291,8 +291,8 @@ function processThunk (apiContext, prop, element, map) {
     apiContext[prop] = function() {
         let originalArguments = arguments;
         const apiContext = this.__root_context__ || this;
-        apiContext.__store__.dispatch((dispatch, getState) => {
-            element.call(null, this, mapStateMap(getState(), map, this)).apply(null, originalArguments);
+        return apiContext.__store__.dispatch((dispatch, getState) => {
+            return element.call(null, this, mapStateMap(getState(), map, this)).apply(null, originalArguments);
         });
     }
 }
