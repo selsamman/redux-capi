@@ -62,29 +62,26 @@ export const matrixAPISpec = {
             ]
         }),
         delRow: (row) => ({
-            matrix: {
-                rows: [
+            matrix: [
                     (state, item, ix) => ix === row,
                     {
                         delete: true,
                     }
                 ]
-            }
+
         }),
         delCol: (row, col) => ({
-            matrix: {
-                rows: [
+            matrix: [
                     (state, item, ix) => ix === row,
-                    {
-                        cols: [
+                   [
                             (state, item, ix) => ix === col,
                             {
                                 delete: true
                             }
                         ]
-                    }
+
                 ]
-            }
+
         }),
 
     },

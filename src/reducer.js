@@ -25,7 +25,7 @@ export const reducer = (rootState, action) => {
 
             // Match up the state with the reaction node and decide if we need to process it.  In the case of
             // stepping through array elements you could have more than one that matched
-            const reactionNode = evaluate(accumulator.reactions, childReactionNode, newState, propOrIndex);
+            const reactionNode = evaluate(accumulator.reactions, childReactionNode, newState, propOrIndex, accumulator.parentProp);
 
             // Process the node?
             if (reactionNode) {
@@ -44,8 +44,9 @@ export const reducer = (rootState, action) => {
                 children = children['__state_marker__'];
                 rootState = newState;
             }
+            const parentProp = typeof propOrIndex === 'number' ? accumulator.parentProp : propOrIndex;
             if (newState instanceof Array)
-                subAccumulator =  oldState.reduce(arrayReducer, { oldState: newState, newState: [], reactions: children });
+                subAccumulator =  oldState.reduce(arrayReducer, { oldState: newState, newState: [], reactions: children, parentProp });
             else
                 subAccumulator = Object.getOwnPropertyNames(oldState).reduce(reducer, { oldState: newState, newState: {}, reactions: children });
 
@@ -99,14 +100,16 @@ export const reducer = (rootState, action) => {
     // assuming the reaction node matches the state property name or in the case of an array matches the array
     // element as evaluated by calling out to the where function.  When processing the array itself we have
     // to push the reaction node into the children array so it will be processed when the elements are evaluated
-    function evaluate(reactionNode, reactionNodeKey, element, propOrIndex) {
+    function evaluate(reactionNode, reactionNodeKey, element, propOrIndex, parentProp) {
 
         let reactionNodeValue = reactionNode[reactionNodeKey];
         const result = {};
 
         // Make sure reaction node matches state property name (unless processing an array)
-        if (propOrIndex != '_' && typeof propOrIndex != "number" && reactionNodeKey !== propOrIndex)
-            return null;
+        if (propOrIndex !== '_') // used for absence of root property
+            if (typeof propOrIndex !== "number" && reactionNodeKey !== propOrIndex ||
+                typeof propOrIndex === "number" && reactionNodeKey !== '_' && reactionNodeKey !== parentProp)
+                return null;
 
         if (reactionNodeValue instanceof Array) {
             if (typeof propOrIndex !== "number") // An array?
