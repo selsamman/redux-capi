@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import {mapStateObjToArray, mapStateArrayToObj, combineStateMapArray, mapStateMap} from './mapState';
 let componentSequence = 1;
-export const trace = {log: ()=>{}};
+export const trace = {log: false};
 
 /*
 createAPI will create context for the api itself that has all of the redaction, selectors, thunks and maps as
@@ -22,20 +22,25 @@ export const createAPI = (spec) => {
 
     // Prepare return value which is the api itself which is called to create a component instance of the api
     const api =  (contextProps, componentInstance) => {
+        const componentName = !componentInstance ? "" :
+            (typeof componentInstance === 'function' ? componentInstance.name.toString() : componentInstance.constructor.name.toString());
+        componentInstance = componentInstance && typeof componentInstance !== "function" ? componentInstance : undefined;
         let context;
         // We have two modes of operation depending on whether classes or functions are used for the component
         if (!componentInstance) {
             // eslint-disable-next-line react-hooks/rules-of-hooks
             let contextContainer = useRef(null);
             if (!contextContainer.current)
-                contextContainer.current = createFunctionContext(contextProps);
+                contextContainer.current = createFunctionContext(contextProps, componentName);
             context = contextContainer.current;
-            manageFunctionSubscriptions(context)
+            manageFunctionSubscriptions(context);
+            context.__name__ = componentName;
         } else {
             if (!componentInstance.__capi_instance__)
-                componentInstance.__capi_instance__ = context = createComponentContext(componentInstance, contextProps);
+                componentInstance.__capi_instance__ = context = createComponentContext(componentInstance, contextProps, componentName);
             context = componentInstance.__capi_instance__;
         }
+        context.__forced_render__ = false;
 
         context.__render_count__++; // We don't have a true render count so use calls to api as proxyc
         assignProps(context, contextProps)
@@ -130,24 +135,25 @@ export const createAPI = (spec) => {
     }
 
     // Create a new context for this instance of the api's use in a function-based component.
-    function createFunctionContext(contextProps) {
+    function createFunctionContext(contextProps, componentName) {
         let context = createContext(apiContext);
         // Since selectors depend on "this" we bind them so they can be called as simple functions
         bindFunctions(context);
         context.__render_count__ = 0;
-        context.__component_instance__ = componentSequence++;
+        context.__component_instance__ = `${componentName} (${componentSequence++})`;
         // eslint-disable-next-line react-hooks/rules-of-hooks
 
-        trace.log("New Component " + context.__component_instance__ + " props:" + JSON.stringify(contextProps));
+        if (trace.log) trace.log(`${context.__component_instance__}: New Instance (${JSON.stringify(contextProps)})`);
         return context;
     }
 
     // Set up a set state function that can trigger a render by modifying the state
     function manageFunctionSubscriptions (context) {
         const [, setSeq] = useState(0);
-        context.__force_render__ = () => {
-            trace.log("force render Component " + context.__component_instance__+ " state " + context.__render_count__)
+        context.__force_render__ = (selectorName) => {
+            if (trace.log) trace.log(`${context.__component_instance__}: Will Render (${selectorName} changed)`)
             setSeq(context.__render_count__);
+            context.__forced_render__ = true;
         }       // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
             return () => {
@@ -165,18 +171,19 @@ export const createAPI = (spec) => {
     }
 
     // Create a new context for this instance of the api's use in a component.
-    function createComponentContext (componentInstance, contextProps) {
+    function createComponentContext (componentInstance, contextProps, componentName) {
         let context = createContext(apiContext)
 
         // setup a function to force a render by modifying the state
         context.__render_count__ = 0;
-        context.__force_render__ = () => {
-            trace.log("force render Component " + context.__component_instance__+ " state " + context.__render_count__)
+        context.__force_render__ = (selectorName) => {
+            if (trace.log) trace.log(`${context.__component_instance__}: Will Render (${selectorName} changed)`)
             if (componentInstance.setState)
                 componentInstance.setState({__render_count__: context.__render_count__});
+            context.__forced_render__ = true;
         }
-        context.__component_instance__ = componentSequence++;
-        trace.log("New Component " + context.__component_instance__  + " props:" + JSON.stringify(contextProps));
+        context.__component_instance__ = `${componentName} (${componentSequence++})`;
+        if (trace.log) trace.log(`${context.__component_instance__}: New Instance (${JSON.stringify(contextProps)})`);
         // Since selectors depend on "this" we bind them so they can be called as simple functions
         bindFunctions(context);
         context.__component_will_unmount = componentInstance.componentWillUnmount;
@@ -218,14 +225,13 @@ function bindFunctions (obj) {
 
 // when the store is changed compare all the selector values against the previous ones in this render cycle
 function storeChanged(context) {
-    trace.log("Store changed for component " + context.__component_instance__ + " : " +JSON.stringify(context.__store__.getState()));
-    trace.log("Selectors: " + Object.getOwnPropertyNames(context.__selector_used__));
+    if (context.__forced_render__)
+        return;
     for (let prop in context.__selector_used__) {
         let v2 = context.__selector_used__[prop];
         let v1 = context[prop];
-        //trace.log("compare " + prop + ": " + JSON.stringify(v1) + " ==? " + JSON.stringify(v2));
         if (v1 !== v2) {
-            context.__force_render__(context);
+            context.__force_render__(prop);
             return;
         }
     }
@@ -242,7 +248,6 @@ function processSelector (apiContext, prop, selectorDef, map) {
         // Create a getter that will invoke the invoker function and track the ref
         Object.defineProperty(apiContext, prop, {get: function () {
                 const value = memoizedInvoker.call(null, memoizedSelector, this);
-                trace.log("selector ref " + prop + ": " + JSON.stringify(value));
                 selectorReferenced(this, prop, value);
                 return value;
             }});

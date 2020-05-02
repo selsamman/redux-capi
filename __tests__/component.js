@@ -19,7 +19,7 @@ describe('Component Testing', () => {
         const api = createAPI(apiSpec).mount(createStore(reducer, {count: 34}));
         const renderCount = 0;
         const Counter = () => {
-            const {count, increment} = api({});
+            const {count, increment} = api({}, Counter);
             return (
                 <button onClick={()=>increment(2)}>{count}</button>
             )
