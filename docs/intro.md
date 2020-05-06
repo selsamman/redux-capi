@@ -10,7 +10,8 @@ Key features include:
 * API implementation is completely isolated from the React component structure
 * API implementation can be reused across multiple components
 * API and components can be tested independently
-* Same pattern used in both function-based and class-based components 
+* API spec can be validated to catch common errors
+* Same usage pattern for both function-based and class-based components 
 
 ### Create an API spec
 An API spec is a JSON structure for defining redactions (self-reducing actions), selectors and thunks.  

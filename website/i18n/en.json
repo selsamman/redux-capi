@@ -69,6 +69,10 @@
         "title": "Thunks",
         "sidebar_label": "Thunks"
       },
+      "spec_validation": {
+        "title": "Validating the API Spec",
+        "sidebar_label": "Validation"
+      },
       "spec": {
         "title": "API specification",
         "sidebar_label": "API Spec"

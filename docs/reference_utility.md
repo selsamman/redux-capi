@@ -15,5 +15,7 @@ Returns the redux store that the api was mounted into
 
 In addition for debugging of applications a trace function is exported and may be overridden to log details of how the API is operating such as logging state changes and renders
 ```
-export const trace = {log: ()=>{}};
+import { reducer, trace } from 'redux-capi';
+
+trace.log = t => console.log(t);
 ```
