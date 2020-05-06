@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import {mapStateObjToArray, mapStateArrayToObj, combineStateMapArray, mapStateMap} from './mapState';
+import {validateRedaction, validateSelector, validateThunk} from "./validate";
 let componentSequence = 1;
 export const trace = {log: false};
 
@@ -18,7 +19,6 @@ export const createAPI = (spec) => {
     };
 
     // Process the api spec recursing as needed for included specs
-
 
     // Prepare return value which is the api itself which is called to create a component instance of the api
     const api =  (contextProps, componentInstance) => {
@@ -63,6 +63,11 @@ export const createAPI = (spec) => {
 
     }
 
+    api.validate = (validationStateShape) => {
+        apiContext.__validation_state_shape__ = validationStateShape
+        return api;
+    }
+
     api.mount = (store, stateMap) => {
         apiContext.__store__ = store;
         processSpec(apiContext.__spec__, apiContext, mapStateObjToArray(stateMap));
@@ -100,7 +105,7 @@ export const createAPI = (spec) => {
     return api;
 
     // Process the api specification recursing as needed for included specs
-    function processSpec(specParam, currentAPIContext, mountInherited) {
+    function processSpec(specParam, currentAPIContext, mountInherited, initialState) {
 
         if (specParam instanceof Array) {
             specParam.map((spec) => processSpec(spec, currentAPIContext, mountInherited))
@@ -115,7 +120,8 @@ export const createAPI = (spec) => {
         if (api) {
             currentAPIContext[api] = {
                 __root_context__: apiContext,
-                __parent_context__: currentAPIContext
+                __parent_context__: currentAPIContext,
+                __validation_state_shape__: currentAPIContext.__validation_state_shape__
             };
             currentAPIContext = currentAPIContext[api];
         }
@@ -259,6 +265,8 @@ function processSelector (apiContext, prop, selectorDef, map) {
                 selectorReferenced(this, prop, value);
                 return value;
             }});
+    if (apiContext.__validation_state_shape__)
+        validateSelector(prop, selectorDef);
 
     function selectorReferenced (context, prop, value) {
         context.__selector_used__[prop] = value;
@@ -300,6 +308,8 @@ function processThunk (apiContext, prop, element, map) {
             return element.call(null, this, mapStateMap(getState(), map, this)).apply(null, originalArguments);
         });
     }
+    if (apiContext.__validation_state_shape__)
+        validateThunk(prop, element);
 }
 
 // Redactions are converted to a quasi-legal action with a type and the schema as a parameter
@@ -315,6 +325,15 @@ function processRedaction (apiContext, prop, actionFunction, map) {
             __schema__: schema,
             context: this,
             apiContext: apiContext});
+        return schema; // for benefit of validation
+    }
+
+    if (apiContext.__validation_state_shape__) {
+        const nonDispatchingAction = () => {
+            const action = actionFunction();
+            return map ? mapStateArrayToObj(map.concat(['__state_marker__']), action) : action;
+        }
+        validateRedaction(prop, nonDispatchingAction, apiContext.__validation_state_shape__);
     }
 }
 

@@ -1,8 +1,10 @@
+import {matrixAPISpec} from "./naked_matrix_where";
+
 describe('matrix.js', () => {it('not generate empty test error', () => {})})
 import {mapStateObjToArray, mapStateArrayToObj} from '../src/mapState';
 
 import {applyMiddleware, createStore} from "redux";
-import { createAPI, reducer } from '../src';
+import {createAPI, reducer, validation} from '../src';
 import ReduxThunk from "redux-thunk";
 
 const CounterSpecPart1 = {
@@ -80,6 +82,13 @@ describe('Composed Counter API Testing', () => {
         expect(JSON.stringify(mapStateArrayToObj(stateArray1))).toBe(JSON.stringify(stateObj1))
         expect(JSON.stringify(mapStateArrayToObj(stateArray2))).toBe(JSON.stringify(stateObj2))
     });
+
+    it('can validate', () => {
+        validation.errors = [];
+        const api = createAPI(ComposedSpec).validate(initialState)
+            .mount(createStore(reducer, initialState, applyMiddleware(ReduxThunk)), mountMap);
+        expect(validation.errors.length).toBe(0);
+    })
 
     it('can increment', () => {
         const api = createAPI(ComposedSpec).mount(createStore(reducer, initialState, applyMiddleware(ReduxThunk)), mountMap);

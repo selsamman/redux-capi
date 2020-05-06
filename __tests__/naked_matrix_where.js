@@ -1,4 +1,4 @@
-import { createAPI, reducer } from '../src';
+import {createAPI, reducer, validation} from '../src';
 import { createStore, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk';
 export let matrixCalled = 0;
@@ -77,6 +77,12 @@ export const matrixAPISpec = {
 const defaultShape = [];
 
 describe('matrix with rows and columns', () => {
+    it('can validate', () => {
+        validation.errors = [];
+        const api = createAPI(matrixAPISpec).validate([[1]])
+            .mount(createStore(reducer, defaultShape, applyMiddleware(ReduxThunk)));
+        expect(validation.errors.length).toBe(0);
+    })
     it('can insert', () => {
         const api = createAPI(matrixAPISpec).mount(createStore(reducer, defaultShape, applyMiddleware(ReduxThunk)));
         const state = api.getState();

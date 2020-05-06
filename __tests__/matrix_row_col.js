@@ -1,78 +1,9 @@
-import { createAPI, reducer } from '../src';
+import {createAPI, reducer, validation} from '../src';
 import { createStore, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk';
 export let matrixCalled = 0;
 
-export const matrixAPISpec2D = {
-    redactions: {
-        setValue: (row, col, value) => ({
-            matrix: {
-                where: (state, item, ix) => ix === row,
-                _: {
-                    where: (state, item, ix) => ix === col,
-                    set: () => value
-                }
-            }
-        }),
-        addRow: () => ({
-            matrix: {
-                append: () => ({cols: []})
-            }
-        }),
-        insertRowAfter: (row) => ({
-            matrix: {
-                after: () => row,
-                insert: () => ({cols: []})
-            }
-        }),
-        insertRowBefore: (row) => ({
-            matrix: {
-                before: () => row,
-                insert: () => ({cols: []})
-            }
-        }),
-        insertColAfter: (row) => ({
-            matrix: {
-                where: (state, item, ix) => ix === row,
-                _: {
-                    after: () => row,
-                    insert: () => ({cols: []})
-                }
-            }
-        }),
-        insertColBefore: (row) => ({
-            matrix: {
-                where: (state, item, ix) => ix === row,
-                _: {
-                    Before: () => row,
-                    insert: () => ({cols: []})
-                }
-            }
-        }),
-        addCol: (row) => ({
-            matrix: {
-                where: (state, item, ix) => ix === row,
-                cols: {
-                    append: () => ({})
-                }
-            }
-        }),
-    },
-    selectors: {
-        matrix: (api,state) => state.matrix
-    },
-    thunks: {
-        set: ({matrix, addRow, addCol, setValue}) => (row, col, value) => {
-            let rowsToAdd = row - matrix.rows.length + 1;
-            while(rowsToAdd--)
-                addRow();
-            let colsToAdd = col - (matrix.rows[row] || []).length + 1;
-            while(colsToAdd--)
-                addCol(row);
-            setValue(row, col, value);
-        }
-    }
-}
+
 export const matrixAPISpec = {
     redactions: {
         setValue: (row, col, value) => ({
@@ -205,6 +136,12 @@ export const matrixAPISpec = {
 const defaultShape = {matrix: {rows: []}};
 
 describe('matrix with rows and columns', () => {
+    it('can validate', () => {
+        validation.errors = [];
+        const api = createAPI(matrixAPISpec).validate({matrix: {rows: [{cols: []}]}})
+            .mount(createStore(reducer, defaultShape, applyMiddleware(ReduxThunk)));
+        expect(validation.errors.length).toBe(0);
+    })
      it('can insert', () => {
          const api = createAPI(matrixAPISpec).mount(createStore(reducer, defaultShape, applyMiddleware(ReduxThunk)));
          const component = {};
