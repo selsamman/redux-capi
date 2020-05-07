@@ -75,7 +75,7 @@ export const createAPI = (spec) => {
     }
 
     api.mock = (mocks, stateMap) => {
-        if (!apiContext.__store__)
+        if (!apiContext.__spec_processed__)
             processSpec(apiContext.__spec__, apiContext, stateMap);
         apiContext.__mocks__ = mocks;
         for (let prop in apiContext) {
@@ -137,6 +137,8 @@ export const createAPI = (spec) => {
 
         for (let prop in redactions || {})
             processRedaction(currentAPIContext, prop, redactions[prop], map);
+
+        apiContext.__spec_processed__ = true;
 
     }
 
