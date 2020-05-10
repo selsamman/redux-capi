@@ -40,8 +40,6 @@ export const createAPI = (spec) => {
                 componentInstance.__capi_instance__ = context = createComponentContext(componentInstance, contextProps, componentName);
             context = componentInstance.__capi_instance__;
         }
-        context.__forced_render__ = false;
-
         context.__render_count__++; // We don't have a true render count so use calls to api as proxyc
         assignProps(context, contextProps)
         clearSelectorsUsed(context)
@@ -161,7 +159,6 @@ export const createAPI = (spec) => {
         context.__force_render__ = (selectorName) => {
             if (trace.log) trace.log(`${context.__component_instance__}: Will Render (${selectorName} changed)`)
             setSeq(context.__render_count__);
-            context.__forced_render__ = true;
         }       // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
             return () => {
@@ -188,7 +185,6 @@ export const createAPI = (spec) => {
             if (trace.log) trace.log(`${context.__component_instance__}: Will Render (${selectorName} changed)`)
             if (componentInstance.setState)
                 componentInstance.setState({__render_count__: context.__render_count__});
-            context.__forced_render__ = true;
         }
         context.__component_instance__ = `${componentName} (${componentSequence++})`;
         if (trace.log) trace.log(`${context.__component_instance__}: New Instance (${JSON.stringify(contextProps)})`);
@@ -233,8 +229,6 @@ function bindFunctions (obj) {
 
 // when the store is changed compare all the selector values against the previous ones in this render cycle
 function storeChanged(context) {
-    if (context.__forced_render__)
-        return;
     for (let prop in context.__selector_used__) {
         let v2 = context.__selector_used__[prop];
         let v1 = context[prop];
