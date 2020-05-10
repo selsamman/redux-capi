@@ -30,14 +30,18 @@ export const createAPI = (spec) => {
         if (!componentInstance) {
             // eslint-disable-next-line react-hooks/rules-of-hooks
             let contextContainer = useRef(null);
-            if (!contextContainer.current)
+            if (!contextContainer.current) {
                 contextContainer.current = createFunctionContext(contextProps, componentName);
+                if (trace.log) trace.log(`${contextContainer.current.__component_instance__}: Render`)
+            }
             context = contextContainer.current;
             manageFunctionSubscriptions(context);
             context.__name__ = componentName;
         } else {
             if (!componentInstance.__capi_instance__)
                 componentInstance.__capi_instance__ = context = createComponentContext(componentInstance, contextProps, componentName);
+            else
+            if (trace.log) trace.log(`${componentInstance.__capi_instance__.__component_instance__}: Render`)
             context = componentInstance.__capi_instance__;
         }
         context.__render_count__++; // We don't have a true render count so use calls to api as proxyc
