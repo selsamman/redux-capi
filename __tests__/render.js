@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
-import {createStore} from "redux";
+import {applyMiddleware, createStore} from "redux";
 import { createRenderer } from 'react-test-renderer/shallow';
 import { createAPI, reducer, trace } from '../src';
+import ReduxThunk from "redux-thunk";
 const renderer1 = createRenderer();
 const renderer2 = createRenderer();
 const apiSpec = {
@@ -32,6 +33,9 @@ const apiSpec = {
             (select, {testValue}) => select(testValue),
             (testValue) => {value: testValue}
         ]
+    },
+    thunks: {
+        logThunk: ({widgets}) => () => console.log(widgets.length)
     }
 }
 let log = [];
@@ -69,9 +73,10 @@ describe('Selector Processing', () => {
         }
     })
     it('Renders only the required component with memo', () => {
-        const api = createAPI(apiSpec).mount(createStore(reducer, initialState));
+        const api = createAPI(apiSpec).mount(createStore(reducer, initialState, applyMiddleware(ReduxThunk)));
         const Widget = ({id}) => {
-            const {widgetMemo} = api({id: id}, Widget);
+            const {widgetMemo, logThunk} = api({id: id}, Widget);
+            logThunk();
             return (<text>{widgetMemo.text}</text>)
         }
         renderer1.render(<Widget id={0} />);

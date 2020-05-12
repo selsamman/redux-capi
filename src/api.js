@@ -313,7 +313,10 @@ function processThunk (apiContext, prop, element, map) {
         let originalArguments = arguments;
         const apiContext = this.__root_context__ || this;
         return apiContext.__store__.dispatch((dispatch, getState) => {
-            return element.call(null, this, mapStateMap(getState(), map, this)).apply(null, originalArguments);
+            this.__nested_selectors__ = (this.__nested_selectors__ || 0) + 1
+            const ret = element.call(null, this, mapStateMap(getState(), map, this)).apply(null, originalArguments);
+            this.__nested_selectors__ -= 1;
+            return ret;
         });
     }
     if (apiContext.__validation_state_shape__)
