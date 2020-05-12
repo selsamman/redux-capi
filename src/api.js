@@ -255,10 +255,10 @@ function processSelector (apiContext, prop, selectorDef, map) {
         Object.defineProperty(apiContext, prop, {get: function () {
                 if (!this['__memo__' + prop])
                     this['__memo__' + prop] = memoize(memoizedSelectorDef);
-                apiContext.__nested_selectors__ = (apiContext.__nested_selectors__ || 0) + 1
+                this.__nested_selectors__ = (this.__nested_selectors__ || 0) + 1
                 const value = memoizedInvoker.call(null, this['__memo__' + prop], this);
-                apiContext.__nested_selectors__ -= 1;
-                if (!apiContext.__nested_selectors__)
+                this.__nested_selectors__ -= 1;
+                if (!this.__nested_selectors__)
                     selectorReferenced(this, prop, value);
                 return value;
             }});
@@ -266,10 +266,10 @@ function processSelector (apiContext, prop, selectorDef, map) {
         // For a simple selector create a getter that just invokes the selector
         Object.defineProperty(apiContext, prop, {get: function () {
                 const apiContext = this.__root_context__ || this;
-                apiContext.__nested_selectors__ = (apiContext.__nested_selectors__ || 0) + 1
+                this.__nested_selectors__ = (this.__nested_selectors__ || 0) + 1
                 const value = selectorDef.call(null, mapStateMap(apiContext.__store__.getState(), map, this), this);
-                apiContext.__nested_selectors__ -= 1;
-                if (!apiContext.__nested_selectors__)
+                this.__nested_selectors__ -= 1;
+                if (!this.__nested_selectors__)
                     selectorReferenced(this, prop, value);
                 return value;
             }});
