@@ -82,7 +82,7 @@ describe('CAPI', () => {
                 expect(memoCount).toBe(0);
                 expect(__selector_used__['memoCount']).toBe(0);
                 increment();
-                expect(memoSelectorCalled).toBe(1); // Because memo never examined since count changed
+                expect(memoSelectorCalled).toBe(2);
             } {
                 let {memoCount} = api({}, component);;
                 expect(memoCount).toBe(1);
