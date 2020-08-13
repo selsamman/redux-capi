@@ -114,7 +114,7 @@ export const createAPI = (spec) => {
             return;
         }
 
-        const {selectors, thunks, redactions, mount, api, spec} = specParam;
+        const {selectors, thunks, redactions, mount, api, spec, context} = specParam;
 
         const map = mount ? combineStateMapArray(mountInherited, mapStateObjToArray(mount)) : mountInherited;
 
@@ -139,6 +139,9 @@ export const createAPI = (spec) => {
 
         for (let prop in redactions || {})
             processRedaction(currentAPIContext, prop, redactions[prop], map);
+
+        for (let prop in context || {})
+            processContext(currentAPIContext, prop, context[prop]);
 
         apiContext.__spec_processed__ = true;
 
@@ -348,6 +351,9 @@ function processRedaction (apiContext, prop, actionFunction, map) {
     }
 }
 
+function processContext (apiContext, prop, payload) {
+    apiContext[prop] = payload;
+}
 
 
 

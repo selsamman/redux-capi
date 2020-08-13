@@ -53,6 +53,10 @@
         "title": "Composing API Specs",
         "sidebar_label": "Composing"
       },
+      "spec_dependency": {
+        "title": "Dependency Injection",
+        "sidebar_label": "Injection"
+      },
       "spec_mounting": {
         "title": "Mounting a spec",
         "sidebar_label": "Mounting"

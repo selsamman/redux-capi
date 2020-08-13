@@ -28,7 +28,9 @@ const apiSpec = {
             while(count--)
                 increment();
             return ret;
-        }    }
+        },
+        multiply: ({count})=> (by) => count * by
+    }
 }
 describe('Counter API Testing', () => {
     it('can increment', async () => {
@@ -40,8 +42,9 @@ describe('Counter API Testing', () => {
             expect(await incrementNAsync(1)).toBe(1);
             expect(api.getState().count).toBe(2);
         } {
-            const {count} = api({}, component);
+            const {count, multiply} = api({}, component);
             expect(count).toBe(2);
+            expect(multiply(2)).toBe(4);
         }
     })
 });
