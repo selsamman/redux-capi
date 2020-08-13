@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Dependency Injection · redux-capi</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Thunks end up becoming the core logic of an application.  As such that have to have many dependencies with other external components like file systems and other libraries.  Dependency injection allows you to inject these dependencies.  The thunks then reference the injected dependencies which can easily be substituted when testing."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Dependency Injection · redux-capi"/><meta property="og:type" content="website"/><meta property="og:url" content="https://selsamman.github.io/redux-capi/"/><meta property="og:description" content="Thunks end up becoming the core logic of an application.  As such that have to have many dependencies with other external components like file systems and other libraries.  Dependency injection allows you to inject these dependencies.  The thunks then reference the injected dependencies which can easily be substituted when testing."/><meta property="og:image" content="https://selsamman.github.io/redux-capi/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://selsamman.github.io/redux-capi/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/redux-capi/img/capi.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/redux-capi/js/scrollSpy.js"></script><link rel="stylesheet" href="/redux-capi/css/main.css"/><script src="/redux-capi/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/redux-capi/"><img class="logo" src="/redux-capi/img/capi.ico" alt="redux-capi"/><h2 class="headerTitleWithLogo">redux-capi</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"></ul></nav></div></header></div></div><div class="navPusher singleRowMobileNav"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Reference</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro">What it is</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro_usage">Usage</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro_rationale">Rationale</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/intro_context">Context</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">API Specs</h3><ul class=""><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec">API Spec</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_redactions">Redactions</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_selectors">Selectors</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_thunks">Thunks</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_mounting">Mounting</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_composition">Composing</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/spec_validation">Validation</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reference</h3><ul class=""><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_createAPI">createAPI</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_api">API</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_mount">api.mount()</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_mocks">api.mock()</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/redux-capi/docs/spec_dependency">Injection</a></li><li class="navListItem"><a class="navItem" href="/redux-capi/docs/reference_utility">Utilities</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Examples</h3><ul class=""><li class="navListItem"><a class="navItem" href="/redux-capi/docs/examples_todo">Todo List</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Dependency Injection</h1></header><article><div><span><p>Thunks end up becoming the core logic of an application.  As such that have to have many dependencies with other external components like file systems and other libraries.  Dependency injection allows you to inject these dependencies.  The thunks then reference the injected dependencies which can easily be substituted when testing.</p>
+<p>This is done by defining &quot;context&quot; in the API spec.  Assume you have this spec:</p>
+<pre><code class="hljs"><span class="hljs-keyword">export</span> const apiSpec = {
+   selectors: {
+       files: <span class="hljs-function"><span class="hljs-params">(state)</span> =&gt;</span> state.files
+   },
+   thunks: {
+       deleteFile: <span class="hljs-function"><span class="hljs-params">({FileSystem, deleteLocalFile})</span> =&gt;</span> async name =&gt; {
+           <span class="hljs-keyword">await</span> FileSystem.deleteAsync(FileSystem.documentDirectory + <span class="hljs-string">"/"</span> + name);
+           deleteLocalFile(name);
+       }
+   },
+   redactions: {
+       deleteLocalFile: <span class="hljs-function"><span class="hljs-params">(name)</span> =&gt;</span> ({
+           files: {
+               where: <span class="hljs-function"><span class="hljs-params">(state, file)</span> =&gt;</span> {
+                   <span class="hljs-keyword">return</span> file.name === name},
+               delete: <span class="hljs-literal">true</span>
+           }
+       })
+   }
+}
+</code></pre>
+<p>In your application you simply inject FileSystem where you create the API</p>
+<pre><code class="hljs"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> FileSystem <span class="hljs-keyword">from</span> <span class="hljs-string">'expo-file-system'</span>;
+<span class="hljs-keyword">import</span> {apiSpec} <span class="hljs-keyword">from</span> <span class="hljs-string">'./capi/someAPI'</span>
+
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">export</span> someAPI = createAPI({...apiSpec, <span class="hljs-attr">context</span>: {<span class="hljs-attr">FileSystem</span>: FileSystem}});  
+</code></pre>
+<p>Now the API will have the normal file system available to it but in the test you can mock it:</p>
+<pre><code class="hljs">import {apiSpec} from './capi/someAPI'
+
+const initialState = {
+    files: <span class="hljs-literal">[{<span class="hljs-identifier">name</span>: "<span class="hljs-identifier">foo</span>"}]</span>
+}
+
+describe('Counter API Testing',<span class="hljs-function"> <span class="hljs-params">()</span> =&gt;</span> {
+    it('can delete', async<span class="hljs-function"> <span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-keyword">let</span> deletedFile = <span class="hljs-literal">[]</span>;
+        <span class="hljs-keyword">let</span> component = {};
+        const FileSystemMock = {
+            deleteAsync:<span class="hljs-function"> (<span class="hljs-params">name</span>) =&gt;</span> deletedFile.push(name),
+            documentDirectory: <span class="hljs-string">"docdir"</span>
+        }
+        const api = create<span class="hljs-constructor">API({<span class="hljs-operator">...</span><span class="hljs-params">apiSpec</span>, <span class="hljs-params">context</span>: {FileSystem: FileSystemMock}})</span>
+                    .mount(create<span class="hljs-constructor">Store(<span class="hljs-params">reducer</span>, <span class="hljs-params">initialState</span>, <span class="hljs-params">applyMiddleware</span>(ReduxThunk)</span>));
+        {
+            <span class="hljs-keyword">let</span> {deleteFile} = api({}, component);
+            await delete<span class="hljs-constructor">File(<span class="hljs-string">"foo"</span>)</span>;
+        }
+        {
+            <span class="hljs-keyword">let</span> {files} = api({}, component);
+            expect(deletedFile<span class="hljs-literal">[<span class="hljs-number">0</span>]</span>).<span class="hljs-keyword">to</span><span class="hljs-constructor">Be(<span class="hljs-string">"docdir/foo"</span>)</span>;
+            expect(files.length).<span class="hljs-keyword">to</span><span class="hljs-constructor">Be(0)</span>;
+        }
+    })
+});
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/redux-capi/docs/reference_mocks"><span class="arrow-prev">← </span><span>api.mock()</span></a><a class="docs-next button" href="/redux-capi/docs/reference_utility"><span>Utilities</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/redux-capi/" class="nav-home"><img src="/redux-capi/img/capi.ico" alt="redux-capi" width="66" height="58"/></a><div><h5>Docs</h5><a href="/redux-capi/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/redux-capi/docs/en/doc2.html">Guides (or other categories)</a><a href="/redux-capi/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/redux-capi/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/redux-capi/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/redux-capi/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Sam Elsamman</section></footer></div></body></html>
