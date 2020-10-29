@@ -55,15 +55,14 @@
               }
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Validating the API Spec</h1></header><article><div><span><p>Because the API specification semantics are so specific it is possible to catch many errors before you even get to testing the API.  That is done through the validate api function:</p>
-<pre><code class="hljs"><span class="hljs-keyword">import</span> {createAPI, reducer, validation} <span class="hljs-keyword">from</span> <span class="hljs-string">'../src'</span>;
+<pre><code class="hljs"><span class="hljs-keyword">import</span> {createAPI, reducer, validation} <span class="hljs-keyword">from</span> <span class="hljs-string">'redux-capi'</span>;
 <span class="hljs-keyword">import</span> { createStore, applyMiddleware } <span class="hljs-keyword">from</span> <span class="hljs-string">'redux'</span>;
 <span class="hljs-keyword">import</span> ReduxThunk <span class="hljs-keyword">from</span> <span class="hljs-string">'redux-thunk'</span>;
 
 describe(<span class="hljs-string">'API Testing'</span>, <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     it(<span class="hljs-string">'spec validation passes'</span>, <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
         validation.errors = [];
-        const api = 
-            createAPI(matrixAPISpec)
+        createAPI(matrixAPISpec)
             .validate(defaultShape)
             .mount(createStore(reducer, defaultShape, applyMiddleware(ReduxThunk)));
         expect(validation.errors.length).toBe(<span class="hljs-number">0</span>);

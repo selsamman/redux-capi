@@ -85,4 +85,17 @@ The state graph looks exactly like the schema in a redaction except that the las
     }
 }
 </code></pre>
+<p>or you may have multiple levels of arrays by nesting where and optionally select as for redactions:</p>
+<pre><code class="hljs">mountPoint = {
+    companies: {
+        where: where: (<span class="hljs-keyword">state</span>, item, ix, api) =&gt; <span class="hljs-keyword">state</span>.companyIx == Ix,
+        select: {
+            todoLists: {
+                 where: (<span class="hljs-keyword">state</span>, item, ix, api) =&gt; 
+                        <span class="hljs-keyword">state</span>.companies[<span class="hljs-keyword">state</span>.companyIx].listIx === ix,
+            }
+        }
+    }
+}
+</code></pre>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/redux-capi/docs/spec_thunks"><span class="arrow-prev">← </span><span>Thunks</span></a><a class="docs-next button" href="/redux-capi/docs/spec_composition"><span>Composing</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/redux-capi/" class="nav-home"><img src="/redux-capi/img/capi.ico" alt="redux-capi" width="66" height="58"/></a><div><h5>Docs</h5><a href="/redux-capi/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/redux-capi/docs/en/doc2.html">Guides (or other categories)</a><a href="/redux-capi/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/redux-capi/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/redux-capi/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/redux-capi/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Sam Elsamman</section></footer></div></body></html>

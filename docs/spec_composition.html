@@ -93,6 +93,37 @@ work.addItem(<span class="hljs-string">"Foo"</span>)
     <span class="hljs-attr">api:</span> <span class="hljs-string">'home'</span><span class="hljs-string">,</span>
     <span class="hljs-attr">mount:</span> <span class="hljs-string">{homeTodos:</span> <span class="hljs-literal">true</span><span class="hljs-string">}</span>     
   <span class="hljs-string">}</span>
+<span class="hljs-string">]);</span>
+</code></pre>
+<p>Another popular use case is to structure your APIs such that they are not aware of their containment structure and then mount them into the appropriate part of the data structure.  Often this may be with arrays.  For example assume you have a data structure as follows:</p>
+<pre><code class="hljs"><span class="hljs-string">{</span>
+    <span class="hljs-attr">cards:</span> <span class="hljs-string">[</span>
+        <span class="hljs-string">{</span>
+            <span class="hljs-attr">workouts:</span> <span class="hljs-string">[</span>
+                <span class="hljs-string">{excercise:</span> <span class="hljs-string">"pec press"</span><span class="hljs-string">,</span> <span class="hljs-attr">reps:</span> <span class="hljs-number">7</span><span class="hljs-string">}</span>
+            <span class="hljs-string">],</span>
+            <span class="hljs-attr">workoutIx:</span> <span class="hljs-number">0</span>
+        <span class="hljs-string">}</span>
+    <span class="hljs-string">]</span>
+    <span class="hljs-attr">cardIx:</span> <span class="hljs-number">0</span><span class="hljs-string">,</span>
 <span class="hljs-string">}</span>
+</code></pre>
+<p>You might have a workout API that does not need no know it is part of a collection of workouts embedded in a gym card and as such only processes one workout at a time.  You might mount that like this:</p>
+<pre><code class="hljs">const composedAPI = createAPI([
+  {
+    spec: [workoutAPISpec],
+    mount: {
+        cards: {
+            where: (<span class="hljs-keyword">state</span>, item, ix) =&gt; ix === <span class="hljs-keyword">state</span>.cardIx,
+            select: {
+                workouts: {
+                    where: (<span class="hljs-keyword">state</span>, item, ix) =&gt;
+                           { return ix === <span class="hljs-keyword">state</span>.cards[<span class="hljs-keyword">state</span>.cardIx].workoutIx }
+                }
+            }
+        }
+    }
+  }
+])
 </code></pre>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/redux-capi/docs/spec_mounting"><span class="arrow-prev">← </span><span>Mounting</span></a><a class="docs-next button" href="/redux-capi/docs/spec_validation"><span>Validation</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/redux-capi/" class="nav-home"><img src="/redux-capi/img/capi.ico" alt="redux-capi" width="66" height="58"/></a><div><h5>Docs</h5><a href="/redux-capi/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/redux-capi/docs/en/doc2.html">Guides (or other categories)</a><a href="/redux-capi/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/redux-capi/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/redux-capi/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/redux-capi/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Sam Elsamman</section></footer></div></body></html>

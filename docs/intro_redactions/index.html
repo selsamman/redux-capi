@@ -63,9 +63,12 @@ insertafter: <span class="hljs-function"><span class="hljs-params">(text, positi
     }
   }),
 </code></pre>
-<p>The where funciton is passed the state, the particular array item and array's index.</p>
+<p>The where function is passed the state, the particular array item and array's index.</p>
 <h3><a class="anchor" aria-hidden="true" id="multiple-levels-of-arrays"></a><a href="#multiple-levels-of-arrays" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>multiple levels of arrays.</h3>
-<p>Sometimes you have multiple levels of an array (a matrix for example) and in that case you can select a particular element using where and then continue the hierarchy using select</p>
+<p>Sometimes you have multiple levels of an array (a matrix for example)</p>
+<pre><code class="hljs">myData = { <span class="hljs-string">[[{prop1: 1, prop2: 2}]]</span> }
+</code></pre>
+<p>In that case you can select a particular element using where and then continue the hierarchy using select</p>
 <pre><code class="hljs">setValue: <span class="hljs-function"><span class="hljs-params">(row, col, value)</span> =&gt;</span> ({
     where: <span class="hljs-function"><span class="hljs-params">(state, item, ix)</span> =&gt;</span> ix === row,
     select: {
@@ -73,5 +76,52 @@ insertafter: <span class="hljs-function"><span class="hljs-params">(text, positi
         set: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> value
     }
 }),
+</code></pre>
+<p>used as:</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> {setValue} = api({});
+setValue(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, {prop1: <span class="hljs-number">1</span>, prop2: <span class="hljs-number">2</span>});
+</code></pre>
+<p>And at times nested arrays may be within properties of array elements:</p>
+<pre><code class="hljs">myData = { <span class="hljs-string">rows:</span> [ {<span class="hljs-string">cols:</span> [{<span class="hljs-string">prop1:</span> <span class="hljs-number">1</span>, <span class="hljs-string">prop2:</span> <span class="hljs-number">2</span>}]} ] }
+</code></pre>
+<pre><code class="hljs">       setValue: <span class="hljs-function"><span class="hljs-params">(row, col, value)</span> =&gt;</span> ({
+            matrix: {
+                rows: {
+                    where: <span class="hljs-function"><span class="hljs-params">(state, item, ix)</span> =&gt;</span> ix === row,
+                    select: {
+                        cols: {
+                            where: <span class="hljs-function"><span class="hljs-params">(state, item, ix)</span> =&gt;</span> ix === col,
+                            set: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> value
+                        }
+                    }
+                }
+            }
+        }),
+
+</code></pre>
+<p>In these examples the indexes of the arrays to modify are passed in as parameters to the redaction function but they may also be present in the context or as another property of the state:</p>
+<pre><code class="hljs"><span class="hljs-string">myData</span> <span class="hljs-string">=</span> <span class="hljs-string">{</span>
+    <span class="hljs-attr">currRowIx:</span> <span class="hljs-number">0</span><span class="hljs-string">,</span> 
+    <span class="hljs-attr">rows:</span> <span class="hljs-string">[</span> <span class="hljs-string">{cols:</span> <span class="hljs-string">[{prop1:</span> <span class="hljs-number">1</span><span class="hljs-string">,</span> <span class="hljs-attr">prop2:</span> <span class="hljs-number">2</span><span class="hljs-string">}]}</span> <span class="hljs-string">]</span> 
+<span class="hljs-string">}</span>
+</code></pre>
+<pre><code class="hljs">       <span class="hljs-built_in">set</span>Value: (value) =&gt; ({
+            matrix: {
+                rows: {
+                    where: (<span class="hljs-keyword">state</span>, item, ix) =&gt; ix === <span class="hljs-keyword">state</span>.currRowIx,
+                    select: {
+                        cols: {
+                            where: (<span class="hljs-keyword">state</span>, item, ix, {currCol}) =&gt; ix === currCol,
+                            <span class="hljs-built_in">set</span>: () =&gt; value
+                        }
+                    }
+                }
+            }
+        }),
+
+</code></pre>
+<p>used as:</p>
+<pre><code class="hljs"><span class="hljs-keyword">const</span> {setValue} = api({currCol: <span class="hljs-number">0</span>}); <span class="hljs-comment">// Supply the column index to modify</span>
+setValue({prop1: <span class="hljs-number">1</span>, prop2: <span class="hljs-number">2</span>});
 </code></pre>
 </span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#redactions">Redactions</a><ul class="toc-headings"><li><a href="#set-mutate-a-single-property">set: Mutate a single property</a></li><li><a href="#assign-mutating-individual-properties">assign: Mutating individual properties</a></li><li><a href="#mutating-multiple-properties-in-a-single-action">Mutating multiple properties in a single action</a></li><li><a href="#insert-inserting-into-an-array">insert: Inserting into an array</a></li><li><a href="#where-modifying-a-particular-element-of-an-array">where: modifying a particular element of an array</a></li><li><a href="#multiple-levels-of-arrays">multiple levels of arrays.</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/redux-capi/" class="nav-home"><img src="/redux-capi/img/capi.ico" alt="redux-capi" width="66" height="58"/></a><div><h5>Docs</h5><a href="/redux-capi/docs/en/doc1.html">Getting Started (or other categories)</a><a href="/redux-capi/docs/en/doc2.html">Guides (or other categories)</a><a href="/redux-capi/docs/en/doc3.html">API Reference (or other categories)</a></div><div><h5>Community</h5><a href="/redux-capi/en/users.html">User Showcase</a><a href="https://stackoverflow.com/questions/tagged/" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://discordapp.com/">Project Chat</a><a href="https://twitter.com/" target="_blank" rel="noreferrer noopener">Twitter</a></div><div><h5>More</h5><a href="/redux-capi/blog">Blog</a><a href="https://github.com/">GitHub</a><a class="github-button" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><a href="https://opensource.facebook.com/" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/redux-capi/img/oss_logo.png" alt="Facebook Open Source" width="170" height="45"/></a><section class="copyright">Copyright © 2020 Sam Elsamman</section></footer></div></body></html>
