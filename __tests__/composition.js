@@ -11,7 +11,8 @@ const CounterSpecPart1 = {
     redactions: {
         increment: () => ({
             count: {
-                set: (state) => (state.count + 1)
+                set: (state) =>
+                { return (state.count + 1) }
             },
             log: {
                 set: (state) => state.log + " increment"
@@ -38,15 +39,33 @@ const ComposedSpec = [
             CounterSpecPart2
         ],
         mount: {single: true},
-    }, {
+    },
+    {
         api: 'multiCounters',// counters api will be referenced by multiCounters
         spec: [
             CounterSpecPart1, // include a single count api
             CounterSpecPart2,
         ],
-         mount: {
-            multi: {
-                where: (state, item, ix, api) => api.counterIx === ix
+        mount: {
+             multi: {
+                 where: (state, item, ix, api) => api.counterIx === ix
+             }
+        },
+    },
+    {
+        api: 'multiMultiCounters',// counters api will be referenced by multiCounters
+        spec: [
+            CounterSpecPart1, // include a single count api
+            CounterSpecPart2,
+        ],
+        mount: {
+             multi1: {
+                where: (state, item, ix) => state.multi1Ix === ix,
+                select: {
+                    multi2: {
+                        where: (state, item, ix) => state.multi1[state.multi1Ix].multi2Ix === ix,
+                    }
+                }
             }
         },
     }
@@ -60,7 +79,18 @@ const initialState = {
         multi: [
             {count: 2, log: ""},
             {count: 3, log: ""}
+        ],
+        multi1Ix: 0,
+        multi1: [
+            {
+                multi2Ix: 1,
+                multi2: [
+                    {count: 2, log: ""},
+                    {count: 1, log: ""}
+                ]
+            }
         ]
+
     }
 }
 
@@ -69,18 +99,25 @@ const mountMap = {
 }
 const stateArray1 = ['a', 'b', ()=>(0), ()=>0, 'c','d'];
 const stateObj1 = {a:{b:[()=>(0),[()=>0,{c: {d: true}}]]}};
+
 const stateArray2 = ['a', 'b', ()=>(0), ()=>0];
 const stateObj2 = {a:{b:[()=>(0),[()=>0, true]]}};
+
+const stateArray3 = ['a', ()=>0, 'b', ()=> 0]
+const stateObj3= {a: [()=>0, {b: [()=>0, true]}]}
+
 describe('Composed Counter API Testing', () => {
 
     it ('can map state obj to Array', () => {
         expect(JSON.stringify(mapStateObjToArray(stateObj1))).toBe(JSON.stringify(stateArray1))
         expect(JSON.stringify(mapStateObjToArray(stateObj2))).toBe(JSON.stringify(stateArray2))
+        expect(JSON.stringify(mapStateObjToArray(stateObj3))).toBe(JSON.stringify(stateArray3))
     })
 
     it ('can map state Array to obj', () => {
         expect(JSON.stringify(mapStateArrayToObj(stateArray1))).toBe(JSON.stringify(stateObj1))
         expect(JSON.stringify(mapStateArrayToObj(stateArray2))).toBe(JSON.stringify(stateObj2))
+        expect(JSON.stringify(mapStateArrayToObj(stateArray3))).toBe(JSON.stringify(stateObj3))
     });
 
     it('can validate', () => {
@@ -95,7 +132,7 @@ describe('Composed Counter API Testing', () => {
         const component = {};
         const params = {multiCounters: {counterIx: 1}};
         {
-            const {increment, increments, multiCounters} = api(params, component);
+            const {increment, increments, multiCounters, multiMultiCounters} = api(params, component);
             increment();
             increments(2);
             expect(api.getState().data.single.count).toBe(4);
@@ -103,8 +140,19 @@ describe('Composed Counter API Testing', () => {
                 const {increment, increments} = multiCounters;
                 increment();
                 increments(2);
+                expect(api.getState().data.single.count).toBe(4);
                 expect(api.getState().data.multi[1].count).toBe(6);
             }
+            {
+                const {increment, increments} = multiMultiCounters;
+                increment();
+                increments(2);
+                expect(api.getState().data.single.count).toBe(4);
+                expect(api.getState().data.multi[1].count).toBe(6);
+                expect(api.getState().data.multi1[0].multi2[0].count).toBe(2);
+                expect(api.getState().data.multi1[0].multi2[1].count).toBe(4);
+            }
+
         } {
             const {count, multiCounters} = api(params, component);
             expect(count).toBe(4);

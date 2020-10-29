@@ -34,3 +34,17 @@ mountPoint = {
     }
 }
 ```
+or you may have multiple levels of arrays by nesting where and optionally select as for redactions:
+```
+mountPoint = {
+    companies: {
+        where: where: (state, item, ix, api) => state.companyIx == Ix,
+        select: {
+            todoLists: {
+                 where: (state, item, ix, api) => 
+                        state.companies[state.companyIx].listIx === ix,
+            }
+        }
+    }
+}
+```

@@ -46,7 +46,7 @@ let initialState = {
     ],
     testValue: 0
 }
-trace.log = (msg)=>{log.push(msg);console.log(msg)};
+trace.log = (msg)=>{log.push(msg);/*console.log(msg)*/};
 describe('Selector Processing', () => {
     it('Renders only the required component', () => {
         const api = createAPI(apiSpec).mount(createStore(reducer, initialState));

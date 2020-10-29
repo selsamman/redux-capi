@@ -36,6 +36,7 @@ const {work, home} = composedAPI();
 work.addItem("Foo")
 home.addItem("Bar");
 ```
+
 Remember that in most cases it is better to just create separate APIs and if this was all there was to the combined APIs that would probably be the better option.  However they may be cases where logic, maybe even in the API itself needs access to both specs and that case you can use the api property as in this example.   
 
 In case you need to include multiple specs and apply them to a single API property and mount point you can use the spec property as in:
@@ -46,7 +47,41 @@ const composedAPI = createAPI([
     api: 'home',
     mount: {homeTodos: true}     
   }
+]);
+```
+
+Another popular use case is to structure your APIs such that they are not aware of their containment structure and then mount them into the appropriate part of the data structure.  Often this may be with arrays.  For example assume you have a data structure as follows:
+```
+{
+	cards: [
+        {
+            workouts: [
+                {excercise: "pec press", reps: 7}
+            ],
+            workoutIx: 0
+        }
+    ]
+	cardIx: 0,
 }
+```
+You might have a workout API that does not need no know it is part of a collection of workouts embedded in a gym card and as such only processes one workout at a time.  You might mount that like this:
+```
+const composedAPI = createAPI([
+  {
+    spec: [workoutAPISpec],
+    mount: {
+        cards: {
+            where: (state, item, ix) => ix === state.cardIx,
+            select: {
+                workouts: {
+                    where: (state, item, ix) =>
+                           { return ix === state.cards[state.cardIx].workoutIx }
+                }
+            }
+        }
+    }
+  }
+])
 ```
 
 

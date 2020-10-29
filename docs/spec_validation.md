@@ -6,15 +6,14 @@ sidebar_label: Validation
 Because the API specification semantics are so specific it is possible to catch many errors before you even get to testing the API.  That is done through the validate api function:
 
 ```
-import {createAPI, reducer, validation} from '../src';
+import {createAPI, reducer, validation} from 'redux-capi';
 import { createStore, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk';
 
 describe('API Testing', () => {
     it('spec validation passes', () => {
         validation.errors = [];
-        const api = 
-            createAPI(matrixAPISpec)
+        createAPI(matrixAPISpec)
             .validate(defaultShape)
             .mount(createStore(reducer, defaultShape, applyMiddleware(ReduxThunk)));
         expect(validation.errors.length).toBe(0);

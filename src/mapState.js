@@ -25,7 +25,10 @@ export function mapStateObjToArray(map) {
             }
     }
 }
-
+/*
+const stateArray3 = ['a', ()=>0, 'b', ()=> 0]
+const stateObj3= {a: [()=>0, {b: [()=>0, true]}]}
+ */
 export function mapStateArrayToObj(map, schema) {
     const obj = {}
     let position = obj;
@@ -49,6 +52,11 @@ export function mapStateArrayToObj(map, schema) {
                 } else {
                     position[prop] = {};
                     position = position[prop]
+                }
+            } else {
+                if (position instanceof Array) {
+                    position[1] = {}
+                    position = position[1];
                 }
             }
             prop = element;

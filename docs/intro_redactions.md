@@ -77,9 +77,14 @@ To modify one particular element of an array you need to decide what element is 
     }
   }),
 ````
-The where funciton is passed the state, the particular array item and array's index.
+ 
+The where function is passed the state, the particular array item and array's index.
 ### multiple levels of arrays.
-Sometimes you have multiple levels of an array (a matrix for example) and in that case you can select a particular element using where and then continue the hierarchy using select
+Sometimes you have multiple levels of an array (a matrix for example)
+```
+myData = { [[{prop1: 1, prop2: 2}]] }
+```
+In that case you can select a particular element using where and then continue the hierarchy using select
 ```
 setValue: (row, col, value) => ({
     where: (state, item, ix) => ix === row,
@@ -89,4 +94,60 @@ setValue: (row, col, value) => ({
     }
 }),
 ```
+used as: 
+```
+const {setValue} = api({});
+setValue(0, 0, {prop1: 1, prop2: 2});
+```
+
+And at times nested arrays may be within properties of array elements:
+```
+myData = { rows: [ {cols: [{prop1: 1, prop2: 2}]} ] }
+```
+```
+       setValue: (row, col, value) => ({
+            matrix: {
+                rows: {
+                    where: (state, item, ix) => ix === row,
+                    select: {
+                        cols: {
+                            where: (state, item, ix) => ix === col,
+                            set: () => value
+                        }
+                    }
+                }
+            }
+        }),
+
+```
+In these examples the indexes of the arrays to modify are passed in as parameters to the redaction function but they may also be present in the context or as another property of the state:
+```
+myData = {
+    currRowIx: 0, 
+    rows: [ {cols: [{prop1: 1, prop2: 2}]} ] 
+}
+```
+```
+       setValue: (value) => ({
+            matrix: {
+                rows: {
+                    where: (state, item, ix) => ix === state.currRowIx,
+                    select: {
+                        cols: {
+                            where: (state, item, ix, {currCol}) => ix === currCol,
+                            set: () => value
+                        }
+                    }
+                }
+            }
+        }),
+
+```
+used as:
+```
+const {setValue} = api({currCol: 0}); // Supply the column index to modify
+setValue({prop1: 1, prop2: 2});
+```
+
+
 

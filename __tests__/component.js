@@ -13,7 +13,7 @@ const apiSpec = {
         count: (state) => state.count
     }
 }
-trace.log = (X)=>{console.log(X)};
+//trace.log = (X)=>{console.log(X)};
 describe('Component Testing', () => {
     it('works end to end in a function', () => {
         const api = createAPI(apiSpec).mount(createStore(reducer, {count: 34}));
