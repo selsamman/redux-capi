@@ -83,7 +83,7 @@ const initialState = {
         multi1Ix: 0,
         multi1: [
             {
-                multi2Ix: 1,
+                multi2Ix: 0,
                 multi2: [
                     {count: 2, log: ""},
                     {count: 1, log: ""}
@@ -149,8 +149,8 @@ describe('Composed Counter API Testing', () => {
                 increments(2);
                 expect(api.getState().data.single.count).toBe(4);
                 expect(api.getState().data.multi[1].count).toBe(6);
-                expect(api.getState().data.multi1[0].multi2[0].count).toBe(2);
-                expect(api.getState().data.multi1[0].multi2[1].count).toBe(4);
+                expect(api.getState().data.multi1[0].multi2[0].count).toBe(5);
+                expect(api.getState().data.multi1[0].multi2[1].count).toBe(1);
             }
 
         } {

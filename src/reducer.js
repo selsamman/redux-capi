@@ -25,7 +25,8 @@ export const reducer = (rootState, action) => {
 
             // Match up the state with the reaction node and decide if we need to process it.  In the case of
             // stepping through array elements you could have more than one that matched
-            const reactionNode = evaluate(accumulator.reactions, childReactionNode, newState, propOrIndex, accumulator.parentProp);
+            const reactionNode = accumulator.stateMarkerFound ? null :
+                evaluate(accumulator.reactions, childReactionNode, newState, propOrIndex, accumulator.parentProp);
 
             // Process the node?
             if (reactionNode) {
@@ -43,6 +44,7 @@ export const reducer = (rootState, action) => {
             if (Object.getOwnPropertyNames(children)[0] === '__state_marker__') {
                 children = children['__state_marker__'];
                 rootState = newState;
+                accumulator.stateMarkerFound = true;
             }
             const parentProp = typeof propOrIndex === 'number' ? accumulator.parentProp : propOrIndex;
             if (newState instanceof Array)
