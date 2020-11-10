@@ -72,7 +72,8 @@ export const createAPI = (spec) => {
 
     api.mount = (store, stateMap) => {
         apiContext.__store__ = store;
-        processSpec(apiContext.__spec__, apiContext, mapStateObjToArray(stateMap));
+        if (!apiContext.__spec_processed__)
+            processSpec(apiContext.__spec__, apiContext, mapStateObjToArray(stateMap));
         return api;
     }
 
