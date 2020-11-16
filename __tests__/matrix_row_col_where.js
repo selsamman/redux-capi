@@ -18,6 +18,19 @@ export const matrixAPISpec = {
                 }
             }
         }),
+        setAll: (value) => ({
+            matrix: {
+                rows: {
+                    where: () => true,
+                    select: {
+                        cols: {
+                            where: () => true,
+                            set: () => value
+                        }
+                    }
+                }
+            }
+        }),
         addRow: () => ({
             matrix: {
                 rows: {
@@ -196,7 +209,7 @@ describe('matrix with rows and columns', () => {
              expect(matrix.rows[2].cols[2]).toBe("2-2");
 
              delCol(1,1);
-         } {
+        } {
              let {matrix, delRow} = api({},component);
 
              expect(matrix.rows[0].cols[0]).toBe("0-0");
@@ -212,7 +225,7 @@ describe('matrix with rows and columns', () => {
              expect(matrix.rows[2].cols[2]).toBe("2-2");
 
              delRow(1);
-         } {
+        } {
              let {matrix} = api({},component);
 
              expect(matrix.rows.length).toBe(2);
@@ -225,7 +238,13 @@ describe('matrix with rows and columns', () => {
              expect(matrix.rows[1].cols[0]).toBe("2-0");
              expect(matrix.rows[1].cols[1]).toBe("2-1");
              expect(matrix.rows[1].cols[2]).toBe("2-2");
+        } {
+            let {setAll} = api({}, component);
+            setAll("all")
+        } {
+             let {matrix} = api({},component);
+             expect(matrix.rows[0].cols[2]).toBe("all");
+             expect(matrix.rows[1].cols[0]).toBe("all");
         }
      })
-
 })
