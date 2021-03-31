@@ -252,7 +252,7 @@ function storeChanged(context) {
 // memoized selectors are only called if the values which the selector uses as inputs change
 function processSelector (apiContext, prop, selectorDef, map) {
     if (selectorDef instanceof  Array) {
-        // For array definition of selector we capture and momize the selector
+        // For array definition of selector we capture and memomize the selector
         let memoizedSelectorDef = selectorDef[1];
         let memoizedInvoker = selectorDef[0];
         // Create a getter that will invoke the invoker function and track the ref
